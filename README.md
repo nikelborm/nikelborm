@@ -20,6 +20,7 @@
 16. [leak-parser](https://github.com/nikelborm/leak-parser)
 17. [vk-friends](https://github.com/nikelborm/vk-friends)
 
+TODO: render automatically from repos I starred and which have me as author
 <!--
 **nikelborm/nikelborm** is a ✨ _special_ ✨ repository because its `README.md` (this file) appears on your GitHub profile.
 
