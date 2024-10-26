@@ -1,5 +1,7 @@
 # Subset of my repos I believe is promising, interesting, fun and just the stuff I'm proud of or loved creating  (because repo pins are limited)
 
+(🥺👉👈 Sorry for the absence of Readmes 🥺👉👈)
+
 1. [autism-stats](https://github.com/nikelborm/autism-stats)
 2. [link-header-css-injection-poc](https://github.com/nikelborm/link-header-css-injection-poc)
 3. [ts-better-tuple](https://github.com/nikelborm/ts-better-tuple)
