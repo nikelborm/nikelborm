@@ -19,6 +19,7 @@
 - [permission-control-draft](https://github.com/nikelborm/permission-control-draft)
 - [leak-parser](https://github.com/nikelborm/leak-parser)
 - [vk-friends](https://github.com/nikelborm/vk-friends)
+- and few other will be added later
 
 TODO: render automatically from repos I starred and which have me as author
 
