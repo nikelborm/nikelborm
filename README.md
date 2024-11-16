@@ -3,6 +3,7 @@
 (🥺👉👈 Sorry for the absence of Readmes 🥺👉👈)
 
 - [autism-stats](https://github.com/nikelborm/autism-stats)
+- [python_snake](https://github.com/nikelborm/python_snake)
 - [link-header-css-injection-poc](https://github.com/nikelborm/link-header-css-injection-poc)
 - [ts-better-tuple](https://github.com/nikelborm/ts-better-tuple)
 - [project-boilerplate](https://github.com/nikelborm/project-boilerplate)
