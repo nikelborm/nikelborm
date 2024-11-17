@@ -9,7 +9,7 @@
 - [project-boilerplate](https://github.com/nikelborm/project-boilerplate)
 - [smarthouse](https://github.com/nikelborm/smarthouse)
 - [joiner](https://github.com/nikelborm/joiner)
-- [chrome-cache-forensics](https://github.com/nikelborm/chrome-cache-forensics)
+<!-- - [chrome-cache-forensics](https://github.com/nikelborm/chrome-cache-forensics) -->
 - [flat-to-nested](https://github.com/nikelborm/flat-to-nested)
 - [cool-enum-experiments](https://github.com/nikelborm/cool-enum-experiments)
 - [puzzle](https://github.com/nikelborm/puzzle)
