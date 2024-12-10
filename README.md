@@ -1,4 +1,4 @@
-# Subset of my repos I believe is promising, interesting, fun and just the stuff I'm proud of or loved creating  (because repo pins are limited)
+# Subset of my repos (including drafts) I believe is promising, interesting, fun, and just the stuff I'm proud of or loved creating  (because repo pins are limited)
 
 (🥺👉👈 Sorry for the absence of Readmes 🥺👉👈)
 
@@ -20,8 +20,8 @@
 - [permission-control-draft](https://github.com/nikelborm/permission-control-draft)
 - [leak-parser](https://github.com/nikelborm/leak-parser)
 - [vk-friends](https://github.com/nikelborm/vk-friends)
-- and few other will be added later
+- and a few others will be added later
 
-TODO: render automatically from repos I starred and which have me as author
+TODO: render automatically from repos I starred and which have me as the author
 
 UPD: damn I just realized that it would be just a list of literally my EVERY repo I have because I have warm feelings for each and every one of them. Don't know what to do. Maybe I'll find another criteria for list them here...
