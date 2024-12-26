@@ -25,3 +25,9 @@
 TODO: render automatically from repos I starred and which have me as the author
 
 UPD: damn I just realized that it would be just a list of literally my EVERY repo I have because I have warm feelings for each and every one of them. Don't know what to do. Maybe I'll find another criteria for listing them here...
+
+<!-- 
+<a href="https://github.com/nikelborm/autism-stats">
+  <img src="https://github-readme-stats.vercel.app/api/pin/?username=nikelborm&repo=autism-stats&theme=tokyonight" alt="autism-stats repo" />
+</a>
+-->
