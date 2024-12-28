@@ -7,7 +7,7 @@ const THEME = 'vision-friendly-dark'
 const START_TOKEN = '<!-- REPO-TABLE-INJECT-START -->';
 const END_TOKEN = '<!-- REPO-TABLE-INJECT-END -->';
 const README_FILE_PATH = 'README.md'
-const REPO_OWNER = 'nikelborm'
+const REPO_OWNER = getEnvVarOrFail('GITHUB_REPOSITORY_OWNER');
 const AMOUNT_OF_COLUMNS = 2;
 const MANUALLY_SELECTED_REPOS = [
   'fetch-github-folder',
@@ -48,6 +48,16 @@ if(startsAt > ensdAt)
   throw new Error(
     "START marker cannot be set after END marker. START marker should go first."
 );
+
+
+function getEnvVarOrFail(name: string) {
+  const envVar = process.env[name];
+
+  if (!envVar)
+    throw new Error(`env var ${name} is not defined`);
+
+  return envVar;
+}
 
 function renderRepo(
   repo: {
