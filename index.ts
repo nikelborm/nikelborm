@@ -10,20 +10,23 @@ const README_FILE_PATH = 'README.md'
 const REPO_OWNER = 'nikelborm'
 const AMOUNT_OF_COLUMNS = 2;
 const MANUALLY_SELECTED_REPOS = [
-  'autism-stats',
+  'fetch-github-folder',
+  'apache-superset-quick-init',
   'python_snake',
-  'link-header-css-injection-poc',
+  'joiner',
   'ts-better-tuple',
   'project-boilerplate',
+  'puzzle',
+  'traceTree',
+  'autism-stats',
+
+  'link-header-css-injection-poc',
   'smarthouse',
-  'joiner',
   'flat-to-nested',
   'cool-enum-experiments',
-  'puzzle',
   'leetcode',
   'shelter-erp',
   'interview-monarchs-task',
-  'traceTree',
   'permission-control-draft',
   'leak-parser',
   'vk-friends'
