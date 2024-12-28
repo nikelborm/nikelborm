@@ -3,11 +3,16 @@
 import "@total-typescript/ts-reset";
 import { readFile, writeFile } from 'fs/promises'
 
+const THEME = 'vision-friendly-dark'
+
 function renderRepo(
   repo: {
     owner: string;
     name: string;
   },
+  /**
+   * [Available Themes](https://github.com/anuraghazra/github-readme-stats/blob/master/themes/README.md)
+   */
   theme: string
 ) {
   return `[![${repo.name} repo](https://github-readme-stats.vercel.app/api/pin/?username=${repo.owner}&repo=${repo.name}&theme=${theme})](https://github.com/${repo.owner}/${repo.name})`;
@@ -60,7 +65,7 @@ function renderRow(fewRepoNames: string[]) {
     name => name
       ? renderRepo(
         { name, owner: 'nikelborm' },
-        'vue-dark'
+        THEME
       )
       : ''
   ).join('|') + '|'
