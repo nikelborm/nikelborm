@@ -4,7 +4,7 @@
 
 <!-- REPO-TABLE-INJECT-START -->
 |[![autism-stats repo](https://github-readme-stats.vercel.app/api/pin/?username=nikelborm&repo=autism-stats&theme=vision-friendly-dark)](https://github.com/nikelborm/autism-stats)|[![python_snake repo](https://github-readme-stats.vercel.app/api/pin/?username=nikelborm&repo=python_snake&theme=vision-friendly-dark)](https://github.com/nikelborm/python_snake)|
-|---|---|
+|-|-|
 |[![link-header-css-injection-poc repo](https://github-readme-stats.vercel.app/api/pin/?username=nikelborm&repo=link-header-css-injection-poc&theme=vision-friendly-dark)](https://github.com/nikelborm/link-header-css-injection-poc)|[![ts-better-tuple repo](https://github-readme-stats.vercel.app/api/pin/?username=nikelborm&repo=ts-better-tuple&theme=vision-friendly-dark)](https://github.com/nikelborm/ts-better-tuple)|
 |[![project-boilerplate repo](https://github-readme-stats.vercel.app/api/pin/?username=nikelborm&repo=project-boilerplate&theme=vision-friendly-dark)](https://github.com/nikelborm/project-boilerplate)|[![smarthouse repo](https://github-readme-stats.vercel.app/api/pin/?username=nikelborm&repo=smarthouse&theme=vision-friendly-dark)](https://github.com/nikelborm/smarthouse)|
 |[![joiner repo](https://github-readme-stats.vercel.app/api/pin/?username=nikelborm&repo=joiner&theme=vision-friendly-dark)](https://github.com/nikelborm/joiner)|[![flat-to-nested repo](https://github-readme-stats.vercel.app/api/pin/?username=nikelborm&repo=flat-to-nested&theme=vision-friendly-dark)](https://github.com/nikelborm/flat-to-nested)|
