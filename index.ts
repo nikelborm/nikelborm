@@ -3,18 +3,6 @@
 import "@total-typescript/ts-reset";
 import { readFile, writeFile } from 'fs/promises'
 
-
-function logObjectNicely(item: any): void {
-  console.dir(item, {
-    colors: true,
-    compact: false,
-    depth: null,
-  });
-}
-
-
-
-
 function renderRepo(
   repo: {
     owner: string;
@@ -24,7 +12,6 @@ function renderRepo(
 ) {
   return `[![${repo.name} repo](https://github-readme-stats.vercel.app/api/pin/?username=${repo.owner}&repo=${repo.name}&theme=${theme})](https://github.com/${repo.owner}/${repo.name})`;
 }
-
 
 const START_TOKEN = '<!-- REPO-TABLE-INJECT-START -->';
 const END_TOKEN = '<!-- REPO-TABLE-INJECT-END -->';
@@ -100,7 +87,7 @@ function renderTable(repos: string[], columnsAmount: number) {
 }
 
 const newReadme = oldReadme.slice(0, startsAt + START_TOKEN.length)
-  + renderTable(manualRepos, 3)
+  + renderTable(manualRepos, 2)
   + oldReadme.slice(ensdAt);
 
 await writeFile("README.md", newReadme)
