@@ -68,32 +68,35 @@ const manualRepos = [
   'vk-friends'
 ]
 
+function renderRow(fewRepoNames: string[]) {
+  return '|' + fewRepoNames.map(
+    name => name
+      ? renderRepo(
+        { name, owner: 'nikelborm' },
+        'vue-dark'
+      )
+      : ''
+  ).join('|') + '|'
+}
+
 function renderTable(repos: string[], columnsAmount: number) {
-  return "\n" + [
-    "|".repeat(columnsAmount + 1),
+  const _ = Object.values(
+    Object.groupBy(
+      repos,
+      (_, i) => Math.floor(i / columnsAmount)
+    )
+  ) as string[][];
+  const [rowsExceptFirst, firstRow] = [_, _.shift()!] as const;
+
+  return [
+    ,
+    renderRow(firstRow),
     "|" + "---|".repeat(columnsAmount),
-    Object
-      .values(
-        Object.groupBy(
-          repos,
-          (_, i) => Math.floor(i / columnsAmount)
-        )
-      )
-      .map(e =>
-        '|' + e!.map(
-          name => name
-            ? renderRepo(
-              {
-                name,
-                owner: 'nikelborm'
-              },
-              'vue-dark'
-            )
-            : ''
-        ).join('|') + '|'
-      )
+    rowsExceptFirst
+      .map(renderRow)
       .join('\n')
-  ].join("\n") + "\n";
+    ,,
+  ].join("\n");
 }
 
 const newReadme = oldReadme.slice(0, startsAt + START_TOKEN.length)
