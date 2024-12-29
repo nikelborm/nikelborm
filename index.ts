@@ -72,23 +72,30 @@ function renderRepo(
   return `[![${repo.name} repo](https://github-readme-stats.vercel.app/api/pin/?username=${repo.owner}&repo=${repo.name}&theme=${theme})](https://github.com/${repo.owner}/${repo.name})`;
 }
 
-function renderRow(fewRepoNames: string[]) {
-  return [
-    ,
-    ...fewRepoNames.map(
-      name => renderRepo(
-        { name, owner: REPO_OWNER },
-        THEME
-      )
-    ),
-    ,
-  ].join('|')
+function renderCell(repoName: string | undefined) {
+  if (!repoName) return '';
+
+  return renderRepo(
+    { name: repoName, owner: REPO_OWNER },
+    THEME
+  );
 }
 
-function renderTable(repos: string[], columnsAmount: number) {
+function renderRow(repoNames: string[], columnsAmount: number) {
+  return Array
+    .from(
+      /* `columnsAmount` maintains amount of columns in cases when the group is half-full */
+      /* `+2` adds | to the sides */
+      { length: columnsAmount + 2 },
+      (_, i) => renderCell(repoNames[i - 1])
+    )
+    .join('|')
+}
+
+function renderTable(repoNames: string[], columnsAmount: number) {
   const _ = Object.values(
     Object.groupBy(
-      repos,
+      repoNames,
       (_, i) => Math.floor(i / columnsAmount)
     )
   ) as string[][];
@@ -96,9 +103,11 @@ function renderTable(repos: string[], columnsAmount: number) {
 
   return [
     ,
-    renderRow(firstRow),
+    renderRow(firstRow, columnsAmount),
     "|" + "-|".repeat(columnsAmount),
-    ...rowsExceptFirst.map(renderRow),
+    ...rowsExceptFirst.map(
+      row => renderRow(row, columnsAmount)
+    ),
     ,
   ].join("\n");
 }

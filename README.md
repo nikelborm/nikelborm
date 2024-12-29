@@ -13,7 +13,9 @@
 |[![cool-enum-experiments repo](https://github-readme-stats.vercel.app/api/pin/?username=nikelborm&repo=cool-enum-experiments&theme=vision-friendly-dark)](https://github.com/nikelborm/cool-enum-experiments)|[![leetcode repo](https://github-readme-stats.vercel.app/api/pin/?username=nikelborm&repo=leetcode&theme=vision-friendly-dark)](https://github.com/nikelborm/leetcode)|
 |[![shelter-erp repo](https://github-readme-stats.vercel.app/api/pin/?username=nikelborm&repo=shelter-erp&theme=vision-friendly-dark)](https://github.com/nikelborm/shelter-erp)|[![interview-monarchs-task repo](https://github-readme-stats.vercel.app/api/pin/?username=nikelborm&repo=interview-monarchs-task&theme=vision-friendly-dark)](https://github.com/nikelborm/interview-monarchs-task)|
 |[![permission-control-draft repo](https://github-readme-stats.vercel.app/api/pin/?username=nikelborm&repo=permission-control-draft&theme=vision-friendly-dark)](https://github.com/nikelborm/permission-control-draft)|[![leak-parser repo](https://github-readme-stats.vercel.app/api/pin/?username=nikelborm&repo=leak-parser&theme=vision-friendly-dark)](https://github.com/nikelborm/leak-parser)|
-|[![vk-friends repo](https://github-readme-stats.vercel.app/api/pin/?username=nikelborm&repo=vk-friends&theme=vision-friendly-dark)](https://github.com/nikelborm/vk-friends)|
+|[![vk-friends repo](https://github-readme-stats.vercel.app/api/pin/?username=nikelborm&repo=vk-friends&theme=vision-friendly-dark)](https://github.com/nikelborm/vk-friends)||
 <!-- REPO-TABLE-INJECT-END -->
 
 UPD: damn I just realized that it would be just a list of literally my EVERY repo I have because I have warm feelings for each and every one of them. Don't know what to do. Maybe I'll find another criteria for listing them here...
+
+1. TODO: Add [lowlighter/metrics](https://github.com/lowlighter/metrics)?
