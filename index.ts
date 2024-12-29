@@ -71,7 +71,7 @@ function renderRepo(
   theme: string
 ) {
   const repoSvgImageURL = new URL(
-    'api/pin/',
+    'api/pin',
     'https://github-readme-stats.vercel.app',
   );
 
