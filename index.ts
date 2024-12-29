@@ -113,8 +113,11 @@ function renderTable(repoNames: string[], columnsAmount: number) {
   ].join("\n");
 }
 
-const newReadme = oldReadme.slice(0, editableZoneStartsAt + START_TOKEN.length)
+const nonEditableTopPart = oldReadme.slice(0, editableZoneStartsAt + START_TOKEN.length);
+const nonEditableBottomPart = oldReadme.slice(editableZoneEndsAt);
+
+const newReadme = nonEditableTopPart
   + renderTable(MANUALLY_SELECTED_REPOS, AMOUNT_OF_COLUMNS)
-  + oldReadme.slice(editableZoneEndsAt);
+  + nonEditableBottomPart
 
 await writeFile(README_FILE_PATH, newReadme)
