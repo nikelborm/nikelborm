@@ -7,6 +7,7 @@ const THEME = 'vision-friendly-dark'
 const START_TOKEN = '<!-- REPO-TABLE-INJECT-START -->';
 const END_TOKEN = '<!-- REPO-TABLE-INJECT-END -->';
 const README_FILE_PATH = 'README.md'
+// this is also a default environment variable provided by Github Action
 const REPO_OWNER = getEnvVarOrFail('GITHUB_REPOSITORY_OWNER');
 const AMOUNT_OF_COLUMNS = 2;
 const MANUALLY_SELECTED_REPOS = [
@@ -35,16 +36,16 @@ const MANUALLY_SELECTED_REPOS = [
 
 const oldReadme = await readFile(README_FILE_PATH, 'utf8')
 
-const startsAt = oldReadme.indexOf(START_TOKEN);
-const ensdAt = oldReadme.indexOf(END_TOKEN);
+const editableZoneStartsAt = oldReadme.indexOf(START_TOKEN);
+const editableZoneEndsAt = oldReadme.indexOf(END_TOKEN);
 
-if(startsAt === -1)
+if(editableZoneStartsAt === -1)
   throw new Error("START marker is missing");
 
-if(ensdAt === -1)
+if(editableZoneEndsAt === -1)
   throw new Error("END marker is missing");
 
-if(startsAt > ensdAt)
+if(editableZoneStartsAt > editableZoneEndsAt)
   throw new Error(
     "START marker cannot be set after END marker. START marker should go first."
 );
@@ -112,8 +113,8 @@ function renderTable(repoNames: string[], columnsAmount: number) {
   ].join("\n");
 }
 
-const newReadme = oldReadme.slice(0, startsAt + START_TOKEN.length)
+const newReadme = oldReadme.slice(0, editableZoneStartsAt + START_TOKEN.length)
   + renderTable(MANUALLY_SELECTED_REPOS, AMOUNT_OF_COLUMNS)
-  + oldReadme.slice(ensdAt);
+  + oldReadme.slice(editableZoneEndsAt);
 
 await writeFile(README_FILE_PATH, newReadme)
