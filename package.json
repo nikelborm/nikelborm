@@ -7,7 +7,7 @@
   "license": "MIT",
   "scripts": {
     "build": "tsc && chmod +x ./dist/index.js",
-    "start": "tsx watch --clear-screen ./index.ts"
+    "start": "GITHUB_REPOSITORY_OWNER='nikelborm' tsx watch --clear-screen ./index.ts"
   },
   "dependencies": {
     "@octokit/core": "^6.1.2"
