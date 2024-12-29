@@ -70,7 +70,7 @@ function renderRepo(
    */
   theme: string
 ) {
-  return `[![${repo.name} repo](https://github-readme-stats.vercel.app/api/pin/?username=${repo.owner}&repo=${repo.name}&theme=${theme})](https://github.com/${repo.owner}/${repo.name})`;
+  return `[![${repo.name} repo](https://github-readme-stats.vercel.app/api/pin/?username=${repo.owner}&repo=${repo.name})](https://github.com/${repo.owner}/${repo.name})`;
 }
 
 function renderCell(repoName: string | undefined) {
