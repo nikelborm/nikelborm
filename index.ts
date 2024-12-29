@@ -70,7 +70,30 @@ function renderRepo(
    */
   theme: string
 ) {
-  return `[![${repo.name} repo](https://github-readme-stats.vercel.app/api/pin/?username=${repo.owner}&repo=${repo.name})](https://github.com/${repo.owner}/${repo.name})`;
+  const repoSvgImageURL = new URL(
+    'api/pin/',
+    'https://github-readme-stats.vercel.app',
+  );
+
+  repoSvgImageURL.search = '?' + new URLSearchParams({
+    username: repo.owner,
+    repo: repo.name,
+    // tests
+    // title_color: "008088",
+    // text_color: "880800",
+    // icon_color: "444000",
+    // border_color: "202644",
+    // bg_color: "202020",
+    // serious
+    title_color: "af7aff",
+    text_color: "e4e4e4",
+    icon_color: "af7aff",
+    bg_color: "010101",
+  })
+
+  const repoURL = `https://github.com/${repo.owner}/${repo.name}`;
+
+  return `[![${repo.name} repo](${repoSvgImageURL})](${repoURL})`;
 }
 
 function renderCell(repoName: string | undefined) {
