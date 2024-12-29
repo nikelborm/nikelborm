@@ -10,8 +10,7 @@
     "start": "tsx watch --clear-screen ./index.ts"
   },
   "dependencies": {
-    "@octokit/core": "^6.1.2",
-    "dotenv-parser-serializer": "^1.0.2"
+    "@octokit/core": "^6.1.2"
   },
   "devDependencies": {
     "@total-typescript/ts-reset": "^0.5.1",
