@@ -1,7 +1,11 @@
 #!/usr/bin/env node
 
-import "@total-typescript/ts-reset";
-import { readFile, writeFile } from 'fs/promises'
+import { Octokit } from '@octokit/core';
+import '@total-typescript/ts-reset';
+import { readFile, writeFile } from 'fs/promises';
+import parseLinkHeader from 'parse-link-header';
+import { z } from 'zod';
+
 
 const THEME = 'vision-friendly-dark'
 const START_TOKEN = '<!-- REPO-TABLE-INJECT-START -->';
@@ -10,6 +14,75 @@ const README_FILE_PATH = 'README.md'
 // this is also a default environment variable provided by Github Action
 const REPO_OWNER = getEnvVarOrFail('GITHUB_REPOSITORY_OWNER');
 const AMOUNT_OF_COLUMNS = 2;
+
+
+const getLinkFieldShapeObject = <const T extends string>(name: T) => {
+  const FieldSchema = z.object({
+    per_page: z.coerce.number(),
+    page: z.coerce.number(),
+    rel: z.literal(name),
+    url: z.string().url()
+  }).strict().optional();
+  return {[name]: FieldSchema} as { [k in T]: typeof FieldSchema }
+};
+
+const LinkHeaderSchema = z.object( {
+  ...getLinkFieldShapeObject('prev'),
+  ...getLinkFieldShapeObject('next'),
+  ...getLinkFieldShapeObject('last'),
+  ...getLinkFieldShapeObject('first')
+})
+
+
+export async function* starsOfUser(username: string, per_page: number) {
+  if (per_page <= 0 || per_page > 100) throw new Error(
+    'Function statsOfUsers accepts only 0 < per_page <= 100'
+  );
+  if(!username) throw new Error(
+    'Function statsOfUsers accepts only non-empty strings as username'
+  );
+
+  const octokit = new Octokit();
+
+  let page = 1;
+  let doAnotherStep = true;
+
+  while (doAnotherStep) {
+    const response = await octokit.request('GET /users/{username}/starred', {
+      username,
+      per_page,
+      page,
+      headers: {
+        'X-GitHub-Api-Version': '2022-11-28'
+      },
+    });
+
+    for (const elem of response.data) {
+      yield 'repo' in elem ? elem.repo : elem;
+    }
+
+    const parsedLinks = LinkHeaderSchema.safeParse(
+      parseLinkHeader(response.headers.link)
+    );
+
+    doAnotherStep = !parsedLinks.success || !!parsedLinks.data.next?.url;
+    page += 1;
+    if(page >= 5) break;
+  }
+}
+
+export async function* selfStarredReposOfUser(username: string) {
+  for await (const repo of starsOfUser(username, 100)) {
+    if(repo.owner.login === username) yield repo
+  }
+}
+
+const reposCreatedByMe: string[] = [];
+
+for await (const repo of selfStarredReposOfUser(REPO_OWNER)) {
+  reposCreatedByMe.push(repo.name);
+}
+
 const MANUALLY_SELECTED_REPOS = [
   'fetch-github-folder',
   'apache-superset-quick-init',
@@ -33,6 +106,9 @@ const MANUALLY_SELECTED_REPOS = [
   'vk-friends'
 ]
 
+// const repoNamesToRender = MANUALLY_SELECTED_REPOS;
+const repoNamesToRender = reposCreatedByMe;
+
 
 const oldReadme = await readFile(README_FILE_PATH, 'utf8')
 
@@ -40,14 +116,14 @@ const editableZoneStartsAt = oldReadme.indexOf(START_TOKEN);
 const editableZoneEndsAt = oldReadme.indexOf(END_TOKEN);
 
 if(editableZoneStartsAt === -1)
-  throw new Error("START marker is missing");
+  throw new Error('START marker is missing');
 
 if(editableZoneEndsAt === -1)
-  throw new Error("END marker is missing");
+  throw new Error('END marker is missing');
 
 if(editableZoneStartsAt > editableZoneEndsAt)
   throw new Error(
-    "START marker cannot be set after END marker. START marker should go first."
+    'START marker cannot be set after END marker. START marker should go first.'
 );
 
 
@@ -79,16 +155,16 @@ function renderRepo(
     username: repo.owner,
     repo: repo.name,
     // tests
-    // title_color: "008088",
-    // text_color: "880800",
-    // icon_color: "444000",
-    // border_color: "202644",
-    // bg_color: "202020",
+    // title_color: '008088',
+    // text_color: '880800',
+    // icon_color: '444000',
+    // border_color: '202644',
+    // bg_color: '202020',
     // serious
-    title_color: "af7aff",
-    text_color: "e4e4e4",
-    icon_color: "af7aff",
-    bg_color: "010101",
+    title_color: 'af7aff',
+    text_color: 'e4e4e4',
+    icon_color: 'af7aff',
+    bg_color: '010101',
   })
 
   const repoURL = `https://github.com/${repo.owner}/${repo.name}`;
@@ -128,19 +204,19 @@ function renderTable(repoNames: string[], columnsAmount: number) {
   return [
     ,
     renderRow(firstRow, columnsAmount),
-    "|" + "-|".repeat(columnsAmount),
+    '|' + '-|'.repeat(columnsAmount),
     ...rowsExceptFirst.map(
       row => renderRow(row, columnsAmount)
     ),
     ,
-  ].join("\n");
+  ].join('\n');
 }
 
 const nonEditableTopPart = oldReadme.slice(0, editableZoneStartsAt + START_TOKEN.length);
 const nonEditableBottomPart = oldReadme.slice(editableZoneEndsAt);
 
 const newReadme = nonEditableTopPart
-  + renderTable(MANUALLY_SELECTED_REPOS, AMOUNT_OF_COLUMNS)
+  + renderTable(repoNamesToRender, AMOUNT_OF_COLUMNS)
   + nonEditableBottomPart
 
 await writeFile(README_FILE_PATH, newReadme)

@@ -7,14 +7,17 @@
   "license": "MIT",
   "scripts": {
     "build": "tsc && chmod +x ./dist/index.js",
-    "start": "GITHUB_REPOSITORY_OWNER='nikelborm' tsx watch --clear-screen ./index.ts"
+    "start": "tsx watch --env-file=.env --clear-screen ./index.ts"
   },
   "dependencies": {
-    "@octokit/core": "^6.1.2"
+    "@octokit/core": "^6.1.2",
+    "parse-link-header": "^2.0.0",
+    "zod": "^3.24.1"
   },
   "devDependencies": {
     "@total-typescript/ts-reset": "^0.5.1",
     "@types/node": "^22.10.2",
+    "@types/parse-link-header": "^2.0.3",
     "@vercel/ncc": "^0.38.1",
     "rimraf": "^6.0.1",
     "tsx": "^4.13.2",
