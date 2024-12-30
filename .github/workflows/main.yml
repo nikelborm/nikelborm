@@ -1,7 +1,8 @@
 name: Auto render repos in README.md
 on:
-  push:
-    branches: [ main ]
+  # push:
+  #   branches: [ main ]
+  workflow_dispatch:
   schedule:
     - cron: '0 0 */5 * *' # every 5 days at 00:00
 
