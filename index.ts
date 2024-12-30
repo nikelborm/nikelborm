@@ -15,12 +15,13 @@ const README_FILE_PATH = 'README.md'
 const REPO_OWNER = getEnvVarOrFail('GITHUB_REPOSITORY_OWNER');
 const AMOUNT_OF_COLUMNS = 2;
 
-
 const getLinkFieldShapeObject = <const T extends string>(name: T) => {
   const FieldSchema = z.object({
     per_page: z.coerce.number(),
     page: z.coerce.number(),
     rel: z.literal(name),
+    direction: z.enum(['asc', 'desc']),
+    sort: z.enum(['updated', 'created']),
     url: z.string().url()
   }).strict().optional();
   return {[name]: FieldSchema} as { [k in T]: typeof FieldSchema }
@@ -33,7 +34,6 @@ const LinkHeaderSchema = z.object( {
   ...getLinkFieldShapeObject('first')
 })
 
-
 export async function* starsOfUser(username: string, per_page: number) {
   if (per_page <= 0 || per_page > 100) throw new Error(
     'Function statsOfUsers accepts only 0 < per_page <= 100'
@@ -42,9 +42,7 @@ export async function* starsOfUser(username: string, per_page: number) {
     'Function statsOfUsers accepts only non-empty strings as username'
   );
 
-  const octokit = new Octokit({
-    // auth: getEnvVarOrFail('GITHUB_TOKEN'),
-  });
+  const octokit = new Octokit();
 
   let page = 1;
   let doAnotherStep = true;
@@ -60,16 +58,27 @@ export async function* starsOfUser(username: string, per_page: number) {
         'X-GitHub-Api-Version': '2022-11-28'
       },
     });
-
-    for (const elem of response.data) {
-      yield 'repo' in elem ? elem.repo : elem;
-    }
+    process.stdout.write(`Fetched page ${page} of ${username}'s starred repos`);
 
     const parsedLinks = LinkHeaderSchema.safeParse(
       parseLinkHeader(response.headers.link)
     );
 
-    doAnotherStep = parsedLinks.success && !!parsedLinks.data.next?.url;
+    if (!parsedLinks.success) {
+      console.log(response.headers.link);
+      console.log(parsedLinks.error.format());
+      throw new Error("Failed to parse Link header of the response")
+    }
+
+    const lastPage = parsedLinks.data.last?.page;
+
+    console.log( lastPage ? ` out of ${lastPage} pages` : '');
+
+    for (const elem of response.data) {
+      yield 'repo' in elem ? elem.repo : elem;
+    }
+
+    doAnotherStep = !!parsedLinks.data.next?.url;
     page += 1;
   }
 }
@@ -85,33 +94,6 @@ const reposCreatedByMe: string[] = [];
 for await (const repo of selfStarredReposOfUser(REPO_OWNER)) {
   reposCreatedByMe.push(repo.name);
 }
-
-const MANUALLY_SELECTED_REPOS = [
-  'fetch-github-folder',
-  'apache-superset-quick-init',
-  'python_snake',
-  'joiner',
-  'ts-better-tuple',
-  'project-boilerplate',
-  'puzzle',
-  'traceTree',
-  'autism-stats',
-
-  'link-header-css-injection-poc',
-  'smarthouse',
-  'flat-to-nested',
-  'cool-enum-experiments',
-  'leetcode',
-  'shelter-erp',
-  'interview-monarchs-task',
-  'permission-control-draft',
-  'leak-parser',
-  'vk-friends'
-]
-
-// const repoNamesToRender = MANUALLY_SELECTED_REPOS;
-const repoNamesToRender = reposCreatedByMe;
-
 
 const oldReadme = await readFile(README_FILE_PATH, 'utf8')
 
@@ -195,14 +177,14 @@ function renderRow(repoNames: string[], columnsAmount: number) {
     .join('|')
 }
 
-function renderTable(repoNames: string[], columnsAmount: number) {
+function renderTable(allRepoNames: string[], columnsAmount: number) {
   const _ = Object.values(
     Object.groupBy(
-      repoNames,
+      allRepoNames,
       (_, i) => Math.floor(i / columnsAmount)
     )
   ) as string[][];
-  const [rowsExceptFirst, firstRow] = [_, _.shift()!] as const;
+  const [rowsExceptFirst, firstRow] = [_, _.shift() || []] as const;
 
   return [
     ,
@@ -219,7 +201,7 @@ const nonEditableTopPart = oldReadme.slice(0, editableZoneStartsAt + START_TOKEN
 const nonEditableBottomPart = oldReadme.slice(editableZoneEndsAt);
 
 const newReadme = nonEditableTopPart
-  + renderTable(repoNamesToRender, AMOUNT_OF_COLUMNS)
+  + renderTable(reposCreatedByMe, AMOUNT_OF_COLUMNS)
   + nonEditableBottomPart
 
 await writeFile(README_FILE_PATH, newReadme)
