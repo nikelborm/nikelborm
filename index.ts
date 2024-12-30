@@ -51,7 +51,9 @@ export async function* starsOfUser(username: string, per_page: number) {
     const response = await octokit.request('GET /users/{username}/starred', {
       username,
       per_page,
+      direction: 'desc', // newest updated go first
       page,
+      sort: 'updated',
       headers: {
         'X-GitHub-Api-Version': '2022-11-28'
       },
@@ -67,7 +69,6 @@ export async function* starsOfUser(username: string, per_page: number) {
 
     doAnotherStep = !parsedLinks.success || !!parsedLinks.data.next?.url;
     page += 1;
-    if(page >= 5) break;
   }
 }
 
