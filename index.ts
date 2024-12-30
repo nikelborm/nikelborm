@@ -43,7 +43,7 @@ export async function* starsOfUser(username: string, per_page: number) {
   );
 
   const octokit = new Octokit({
-    auth: getEnvVarOrFail('GITHUB_TOKEN'),
+    // auth: getEnvVarOrFail('GITHUB_TOKEN'),
   });
 
   let page = 1;
