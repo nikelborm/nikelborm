@@ -42,7 +42,9 @@ export async function* starsOfUser(username: string, per_page: number) {
     'Function statsOfUsers accepts only non-empty strings as username'
   );
 
-  const octokit = new Octokit();
+  const octokit = new Octokit({
+    auth: getEnvVarOrFail('GITHUB_TOKEN'),
+  });
 
   let page = 1;
   let doAnotherStep = true;
@@ -67,7 +69,7 @@ export async function* starsOfUser(username: string, per_page: number) {
       parseLinkHeader(response.headers.link)
     );
 
-    doAnotherStep = !parsedLinks.success || !!parsedLinks.data.next?.url;
+    doAnotherStep = parsedLinks.success && !!parsedLinks.data.next?.url;
     page += 1;
   }
 }
