@@ -25,16 +25,16 @@ export async function renderRepoToMarkdownBadge(
     username: owner,
     repo: name,
     // tests
-    title_color: '008088',
-    text_color: '880800',
-    icon_color: '444000',
-    border_color: '202644',
-    bg_color: '202020',
+    // title_color: '008088',
+    // text_color: '880800',
+    // icon_color: '444000',
+    // border_color: '202644',
+    // bg_color: '202020',
     // nice theme
-    // title_color: 'af7aff',
-    // text_color: 'e4e4e4',
-    // icon_color: 'af7aff',
-    // bg_color: '010101',
+    title_color: 'af7aff',
+    text_color: 'e4e4e4',
+    icon_color: 'af7aff',
+    bg_color: '010101',
   });
 
   const { statusCode, body } = await request(repoPreviewSvgImageURL)
@@ -56,10 +56,10 @@ export async function renderRepoToMarkdownBadge(
 
   const repoURL = `https://github.com/${owner}/${name}`;
 
+  return `[![${name} repo](${repoPreviewSvgImageURL})](${repoURL})`;
   // return `[![${name} repo](./images/${owner}_${name}.svg)](${repoURL})`;
 
-  return `<a href="${repoURL}">${text}</a>`
-
+  // return `<a href="${repoURL}">${text}</a>`
 }
 
 
