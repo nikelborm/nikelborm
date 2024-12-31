@@ -41,20 +41,16 @@ const {
 });
 
 let delayedError: Error | null = null;
-
-const fetchedReposCreatedAndStarredByMe = process.env['MOCK_API'] === 'true'
-  ? [
-    { name: "apache-superset-quick-init", owner: REPO_OWNER },
-    { name: "download-github-folder", owner: REPO_OWNER },
-  ]
-  : []
-
+const fetchedReposCreatedAndStarredByMe = [];
 const futureRepoBadges: Promise<string>[] = [];
 
 try {
   for await (const repo of (
-    fetchedReposCreatedAndStarredByMe.length
-      ? fetchedReposCreatedAndStarredByMe
+    process.env['MOCK_API'] === 'true'
+      ? [
+        { name: "apache-superset-quick-init", owner: REPO_OWNER },
+        { name: "download-github-folder", owner: REPO_OWNER },
+      ]
       : selfStarredReposOfUser(REPO_OWNER)
   )) {
     console.log(`Found own starred repo: ${repo.name}`);
