@@ -43,11 +43,11 @@ export async function renderRepoToMarkdownBadge(
     throw new Error(`failed to fetch repo image for ${repoPreviewSvgImageURL}`);
 
   const text = (await body.text())
-    .replaceAll('008088', 'var(--fgColor-default, var(--color-fg-default))')
-    .replaceAll('880800', 'var(--fgColor-default, var(--color-fg-default))')
-    .replaceAll('444000', 'var(--button-star-iconColor)')
-    .replaceAll('202644', 'var(--borderColor-default,var(--color-border-default,#30363d))')
-    .replaceAll('202020', 'var(--bgColor-default, var(--color-canvas-default))')
+    .replaceAll('#008088', 'var(--fgColor-default, var(--color-fg-default))')
+    .replaceAll('#880800', 'var(--fgColor-default, var(--color-fg-default))')
+    .replaceAll('#444000', 'var(--button-star-iconColor)')
+    .replaceAll('#202644', 'var(--borderColor-default,var(--color-border-default,#30363d))')
+    .replaceAll('#202020', 'var(--bgColor-default, var(--color-canvas-default))')
 
   console.log(repoPreviewSvgImageURL, text);
   await writeFile(`./images/${owner}_${name}.svg`, text);
