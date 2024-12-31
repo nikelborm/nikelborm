@@ -7,6 +7,7 @@ import { outdent } from 'outdent';
 import {
   extractReposFromMarkdown,
   getEnvVarOrFail,
+  getMockRepos,
   IRepo,
   renderMarkdownTableOfSmallStrings,
   renderRepoToMarkdownPin,
@@ -44,14 +45,7 @@ const futureRepoPins: { repo: IRepo, pin: Promise<string>}[] = [];
 
 try {
   const repos = process.env['MOCK_API'] === 'true'
-    ? ["apache-superset-quick-init", "download-github-folder"]
-      .map(name => ({
-        name,
-        isItArchived: false,
-        isTemplate: false,
-        lastTimeBeenPushedInto: new Date(),
-        owner: REPO_OWNER
-      }))
+    ? await getMockRepos()
     : selfStarredReposOfUser(REPO_OWNER);
 
   for await (const repo of repos) {

@@ -1,4 +1,5 @@
 export * from './getEnvVarOrFail.js';
+export * from './getMockRepos.js';
 export * from './markdownPinToAndFrom.js';
 export * from './parseLinkHeader.js';
 export * from './renderMarkdownTableOfSmallStrings.js';
