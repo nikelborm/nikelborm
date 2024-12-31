@@ -6,16 +6,16 @@ import { outdent } from 'outdent';
 
 export async function renderRepoToMarkdownPin({ owner, name }: IRepo) {
   const {
-    sourceRepoPreviewSvgImage,
-    sourceRepoPreviewSvgImageURL
+    originalRepoPinSVG,
+    originalRepoPinURL
   } = await fetchOriginalRepoPin({ owner, name });
 
-  const repoPreviewSvgImageDarkTheme = sourceRepoPreviewSvgImage
-    // .replaceAll('#008088', 'var(--fgColor-default, var(--color-fg-default))')
-    // .replaceAll('#880800', 'var(--fgColor-default, var(--color-fg-default))')
-    // .replaceAll('#444000', 'var(--button-star-iconColor)')
-    // .replaceAll('#202644', 'var(--borderColor-default,var(--color-border-default,#30363d))')
-    // .replaceAll('#202020', 'var(--bgColor-default, var(--color-canvas-default))')
+  const repoPreviewSvgImageDarkTheme = originalRepoPinSVG
+    // .replaceAll('#008088', /* title_color  */ 'var(--fgColor-default, var(--color-fg-default))')
+    // .replaceAll('#880800', /* text_color   */ 'var(--fgColor-default, var(--color-fg-default))')
+    // .replaceAll('#444000', /* icon_color   */ 'var(--button-star-iconColor)')
+    // .replaceAll('#202644', /* border_color */ 'var(--borderColor-default,var(--color-border-default,#30363d))')
+    // .replaceAll('#202020', /* bg_color     */ 'var(--bgColor-default, var(--color-canvas-default))')
     .replaceAll('height="150"', 'height="115"')
     .replaceAll('height="140"', 'height="105"')
     .replaceAll('height="120"', 'height="85"')
@@ -39,20 +39,20 @@ export async function renderRepoToMarkdownPin({ owner, name }: IRepo) {
     Written files:
     1. ${imageFileNameDarkTheme}
     2. ${imageFileNameLightTheme}
-    Those files are transformed versions of ${sourceRepoPreviewSvgImageURL}
+    Those files are transformed versions of ${originalRepoPinURL}\n
   `);
 
   const repoURL = `https://github.com/${owner}/${name}`;
 
   const prefixOfGitHubCDN = `https://raw.githubusercontent.com/${owner}/${owner}/refs/heads/main/`;
 
-  const newRepoPreviewSvgDarkThemeImageURL = prefixOfGitHubCDN + imageFileNameDarkTheme;
-  const newRepoPreviewSvgLightThemeImageURL = prefixOfGitHubCDN + imageFileNameLightTheme;
+  const newDarkThemeRepoPinURL = prefixOfGitHubCDN + imageFileNameDarkTheme;
+  const newLightThemeRepoPinURL = prefixOfGitHubCDN + imageFileNameLightTheme;
 
-  // return `[![${name} repo](${sourceRepoPreviewSvgImageURL})](${repoURL})`;
+  // return `[![${name} repo](${sourceRepoPinURL})](${repoURL})`;
   return outdent({ newline: '' })`
-    [![${name} repo](${newRepoPreviewSvgDarkThemeImageURL})](${repoURL + '#gh-dark-mode-only'})
-    [![${name} repo](${newRepoPreviewSvgLightThemeImageURL})](${repoURL + '#gh-light-mode-only'})
+    [![${name} repo](${newDarkThemeRepoPinURL})](${repoURL + '#gh-dark-mode-only'})
+    [![${name} repo](${newLightThemeRepoPinURL})](${repoURL + '#gh-light-mode-only'})
   `;
 
   // return `<a href="${repoURL}">${text}</a>`
@@ -60,12 +60,12 @@ export async function renderRepoToMarkdownPin({ owner, name }: IRepo) {
 
 
 async function fetchOriginalRepoPin({ owner, name }: IRepo) {
-  const sourceRepoPreviewSvgImageURL = new URL(
+  const originalRepoPinURL = new URL(
     'api/pin',
     'https://github-readme-stats.vercel.app',
   );
 
-  sourceRepoPreviewSvgImageURL.search = '?' + new URLSearchParams({
+  originalRepoPinURL.search = '?' + new URLSearchParams({
     username: owner,
     repo: name,
     // theme: '', // https://github.com/anuraghazra/github-readme-stats/blob/master/themes/README.md
@@ -92,24 +92,24 @@ async function fetchOriginalRepoPin({ owner, name }: IRepo) {
     hide_border: 'true',
   });
 
-  console.log(`Started fetching ${sourceRepoPreviewSvgImageURL}`);
-  const { statusCode, body } = await request(sourceRepoPreviewSvgImageURL)
+  console.log(`Started fetching ${originalRepoPinURL}`);
+  const { statusCode, body } = await request(originalRepoPinURL)
 
   if (statusCode !== 200) throw new Error(
-    `statusCode=${statusCode}: Failed to fetch repo image for ${sourceRepoPreviewSvgImageURL}`
+    `statusCode=${statusCode}: Failed to fetch repo pin image for ${originalRepoPinURL}`
   );
 
-  console.log(`Fetched ${sourceRepoPreviewSvgImageURL}`);
+  console.log(`Fetched ${originalRepoPinURL}`);
 
   return {
-    sourceRepoPreviewSvgImageURL,
-    sourceRepoPreviewSvgImage: await body.text()
+    originalRepoPinURL,
+    originalRepoPinSVG: await body.text()
   };
 }
 
 const MarkdownRepoPinZodSchema = z.object({
   repoName: z.string().min(1),
-  repoPreviewSvgImageURL: z.string().min(50).url(),
+  repoPinURL: z.string().min(50).url(),
   repoURL: z.string().min(22).url()
 }).strict().array()
 
@@ -117,7 +117,7 @@ const MarkdownRepoPinZodSchema = z.object({
 export function extractReposFromMarkdown(markdownText: string) {
   const markdownRepoPins = [
     ...markdownText.matchAll(
-      /\[!\[(?<repoName>[^[\]()]+) repo\]\((?<repoPreviewSvgImageURL>https:\/\/github-readme-stats\.vercel\.app\/api\/pin[^[\]()]+)\)\]\((?<repoURL>[^[\]()]+)\)/g
+      /\[!\[(?<repoName>[^[\]()]+) repo\]\((?<repoPinURL>https:\/\/github-readme-stats\.vercel\.app\/api\/pin[^[\]()]+)\)\]\((?<repoURL>[^[\]()]+)\)/g
     )
   ].map(({ groups }) => groups);
 
