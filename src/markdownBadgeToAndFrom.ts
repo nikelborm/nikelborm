@@ -48,7 +48,7 @@ export async function renderRepoToMarkdownBadge(
     .replaceAll('#444000', 'var(--button-star-iconColor)')
     .replaceAll('#202644', 'var(--borderColor-default,var(--color-border-default,#30363d))')
     .replaceAll('#202020', 'var(--bgColor-default, var(--color-canvas-default))')
-    // .replaceAll(/\s+/mg, ' ');
+    .replaceAll(/\s+/mg, ' ');
 
   console.log(repoPreviewSvgImageURL + '\n');
   console.log(text + '\n');
@@ -56,9 +56,9 @@ export async function renderRepoToMarkdownBadge(
 
   const repoURL = `https://github.com/${owner}/${name}`;
 
-  return `[![${name} repo](./images/${owner}_${name}.svg)](${repoURL})`;
+  // return `[![${name} repo](./images/${owner}_${name}.svg)](${repoURL})`;
 
-  // return `<a href="${repoURL}">${text}</a>`
+  return `<a href="${repoURL}">${text}</a>`
 
 }
 

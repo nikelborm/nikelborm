@@ -7,7 +7,8 @@
   "license": "MIT",
   "scripts": {
     "build": "tsc && chmod +x ./dist/index.js",
-    "start": "tsx watch --env-file=.env --clear-screen ./index.ts"
+    "start": "tsx watch --env-file=.env --clear-screen ./index.ts",
+    "once": "tsx --env-file=.env ./index.ts"
   },
   "dependencies": {
     "@octokit/core": "^6.1.2",
