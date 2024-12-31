@@ -1,7 +1,5 @@
-export interface IRepo {
-  owner: string;
-  name: string;
-}
+import { renderRepoToMarkdownBadge } from './markdownBadgeToAndFrom.js';
+import { IRepo } from './repo.interface.js';
 
 export function renderReposTableToMarkdown(allRepos: IRepo[], columnsAmount: number) {
   const _ = Object.values(
@@ -23,49 +21,6 @@ export function renderReposTableToMarkdown(allRepos: IRepo[], columnsAmount: num
   ].join('\n');
 }
 
-
-function renderRepoToMarkdownBadge(
-  { owner, name }: IRepo,
-  /**
-   * [Available Themes](https://github.com/anuraghazra/github-readme-stats/blob/master/themes/README.md)
-   */
-  // theme: string
-) {
-  const repoSvgImageURL = new URL(
-    'api/pin',
-    'https://github-readme-stats.vercel.app',
-  );
-
-  repoSvgImageURL.search = '?' + new URLSearchParams({
-    username: owner,
-    repo: name,
-    // tests
-    // title_color: '008088',
-    // text_color: '880800',
-    // icon_color: '444000',
-    // border_color: '202644',
-    // bg_color: '202020',
-    // serious
-    title_color: 'af7aff',
-    text_color: 'e4e4e4',
-    icon_color: 'af7aff',
-    bg_color: '010101',
-  })
-
-  // border color
-  // var(--borderColor-default,var(--color-border-default,#30363d))
-
-  const repoURL = `https://github.com/${owner}/${name}`;
-
-  return `[![${name} repo](${repoSvgImageURL})](${repoURL})`;
-}
-
-function renderCell(repo?: IRepo) {
-  if (!repo) return '';
-
-  return renderRepoToMarkdownBadge(repo, /* THEME */);
-}
-
 function renderRow(reposGroup: IRepo[], columnsAmount: number) {
   return Array
     .from(
@@ -75,4 +30,10 @@ function renderRow(reposGroup: IRepo[], columnsAmount: number) {
       (_, i) => renderCell(reposGroup[i - 1])
     )
     .join('|')
+}
+
+function renderCell(repo?: IRepo) {
+  if (!repo) return '';
+
+  return renderRepoToMarkdownBadge(repo, /* THEME */);
 }
