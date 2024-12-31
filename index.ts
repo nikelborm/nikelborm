@@ -97,19 +97,20 @@ if (process.env['MOCK_API'] !== 'true')
   );
 
 futureRepoPins.sort((a, b) => {
-  const templateToTop = -(+a.repo.isTemplate - +b.repo.isTemplate);
+  const compare = (c: (r: IRepo) => number) => c(a.repo) - c(b.repo);
+  const templateToTop = -compare(r => +r.isTemplate);
   if (templateToTop) return templateToTop;
 
-  const boilerplatesToTop = -(+a.repo.name.includes('boiler') - +b.repo.name.includes('boiler'));
+  const boilerplatesToTop = -compare(r => +r.name.includes('boiler'));
   if (boilerplatesToTop) return boilerplatesToTop;
 
-  const archivedToBottom = (+a.repo.isItArchived - +b.repo.isItArchived);
+  const archivedToBottom = compare(r => +r.isItArchived);
   if (archivedToBottom) return archivedToBottom;
 
-  const hackathonsToBottom = (+a.repo.name.includes('hackathon') - +b.repo.name.includes('hackathon'));
+  const hackathonsToBottom = compare(r => +r.name.includes('hackathon'));
   if (hackathonsToBottom) return hackathonsToBottom;
 
-  const experimentsToBottom = (+a.repo.name.includes('experiment') - +b.repo.name.includes('experiment'));
+  const experimentsToBottom = compare(r => +r.name.includes('experiment'));
   if (experimentsToBottom) return experimentsToBottom;
 
 
