@@ -40,7 +40,7 @@ export async function* starredReposOfUser(username: string, per_page: number) {
 
     const lastPage = linkHeader.last?.page;
 
-    console.log( lastPage ? ` out of ${lastPage} pages` : '');
+    console.log( lastPage ? ` out of ${lastPage} pages` : ` pages`);
 
     for (const elem of response.data) {
       yield 'repo' in elem ? elem.repo : elem;
