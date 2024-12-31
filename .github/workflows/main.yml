@@ -46,3 +46,5 @@ jobs:
         with:
           name: Repos created and starred by me
           path: ./reposCreatedAndStarredByMe.json
+          if-no-files-found: error
+          retention-days: 15
