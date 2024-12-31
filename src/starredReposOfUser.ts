@@ -48,7 +48,12 @@ export async function* starredReposOfUser(username: string, per_page: number) {
       yield {
         name: repo.name,
         owner: repo.owner.login,
-      } satisfies IRepo
+        isItArchived: repo.archived,
+        isTemplate: !!repo.is_template,
+        lastTimeBeenPushedInto: repo.pushed_at
+          ? new Date(repo.pushed_at)
+          : null,
+      }
     }
 
     doAnotherStep = !!linkHeader.next?.url;

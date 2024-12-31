@@ -7,6 +7,7 @@ import { outdent } from 'outdent';
 import {
   extractReposFromMarkdown,
   getEnvVarOrFail,
+  IRepo,
   renderMarkdownTableOfSmallStrings,
   renderRepoToMarkdownPin,
   selfStarredReposOfUser,
@@ -14,14 +15,13 @@ import {
 } from './src/index.js';
 import { format } from 'node:util';
 
-// const THEME = 'vision-friendly-dark'
 const START_TOKEN = '<!-- REPO-TABLE-INJECT-START -->';
 const END_TOKEN = '<!-- REPO-TABLE-INJECT-END -->';
-const README_FILE_PATH = 'README.md'
+const README_FILE_PATH = 'README.md';
 // this is also a default environment variable provided by Github Action
 const REPO_OWNER = getEnvVarOrFail('GITHUB_REPOSITORY_OWNER');
 const AMOUNT_OF_COLUMNS = 3;
-// I'm okay with loosing less than 20% of pins
+// I'm okay with loosing less than 20% of pins due to reaching rate limits
 const FATAL_PERCENT_OF_REPOS_LOST_DUE_TO_API_ERRORS = 80;
 
 const oldReadme = await readFile(README_FILE_PATH, 'utf8');
@@ -39,26 +39,32 @@ const {
 });
 
 let delayedError: Error | null = null;
-const fetchedReposCreatedAndStarredByMe = [];
-const futureRepoPins: Promise<string>[] = [];
+
+const futureRepoPins: { repo: IRepo, pin: Promise<string>}[] = [];
 
 try {
   const repos = process.env['MOCK_API'] === 'true'
-    ? [
-      { name: "apache-superset-quick-init", owner: REPO_OWNER },
-      { name: "download-github-folder", owner: REPO_OWNER },
-    ]
+    ? ["apache-superset-quick-init", "download-github-folder"]
+      .map(name => ({
+        name,
+        isItArchived: false,
+        isTemplate: false,
+        lastTimeBeenPushedInto: new Date(),
+        owner: REPO_OWNER
+      }))
     : selfStarredReposOfUser(REPO_OWNER);
 
   for await (const repo of repos) {
     console.log(`Found own starred repo: ${repo.name}`);
 
-    fetchedReposCreatedAndStarredByMe.push(repo);
-    futureRepoPins.push(renderRepoToMarkdownPin(repo));
+    futureRepoPins.push({
+      repo,
+      pin: renderRepoToMarkdownPin(repo)
+    });
   }
 } catch (error) {
   const passesGracefulDegradationCondition = error instanceof RequestError
-    && fetchedReposCreatedAndStarredByMe.length > (
+    && futureRepoPins.length > (
       extractReposFromMarkdown(oldEditablePart).length
         * FATAL_PERCENT_OF_REPOS_LOST_DUE_TO_API_ERRORS / 100
     );
@@ -81,7 +87,16 @@ try {
   );
 }
 
-const repoPins = await Promise.all(futureRepoPins);
+await writeFile(
+  './reposCreatedAndStarredByMe.json',
+  JSON.stringify(futureRepoPins.map(_ => _.repo))
+);
+
+// futureRepoPins.sort((a, b) => {})
+
+const repoPins = await Promise.all(
+  futureRepoPins.map(_ => _.pin)
+);
 
 const newReadme = nonEditableTopPart
   + renderMarkdownTableOfSmallStrings(

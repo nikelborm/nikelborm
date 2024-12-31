@@ -1,4 +1,7 @@
 export interface IRepo {
-  owner: string;
   name: string;
+  isItArchived: boolean;
+  isTemplate: boolean;
+  lastTimeBeenPushedInto: Date | null;
+  owner: string;
 }

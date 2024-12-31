@@ -68,7 +68,7 @@ async function fetchOriginalRepoPin({ owner, name }: IRepo) {
   originalRepoPinURL.search = '?' + new URLSearchParams({
     username: owner,
     repo: name,
-    // theme: '', // https://github.com/anuraghazra/github-readme-stats/blob/master/themes/README.md
+    // theme: 'vision-friendly-dark', // https://github.com/anuraghazra/github-readme-stats/blob/master/themes/README.md
     // description_lines_count: '3',
 
     // test theme
