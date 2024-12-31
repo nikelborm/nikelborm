@@ -4,7 +4,9 @@ import { request } from 'undici';
 import { writeFile } from 'node:fs/promises';
 import { outdent } from 'outdent';
 
-export async function renderRepoToMarkdownPin({ owner, name }: IRepo) {
+type SmallRepo = Pick<IRepo, 'owner' | 'name'>;
+
+export async function renderRepoToMarkdownPin({ owner, name }: SmallRepo) {
   const {
     originalRepoPinSVG,
     originalRepoPinURL
@@ -59,7 +61,7 @@ export async function renderRepoToMarkdownPin({ owner, name }: IRepo) {
 }
 
 
-async function fetchOriginalRepoPin({ owner, name }: IRepo) {
+async function fetchOriginalRepoPin({ owner, name }: SmallRepo) {
   const originalRepoPinURL = new URL(
     'api/pin',
     'https://github-readme-stats.vercel.app',
