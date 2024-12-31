@@ -24,34 +24,43 @@ export async function renderRepoToMarkdownBadge(
   repoPreviewSvgImageURL.search = '?' + new URLSearchParams({
     username: owner,
     repo: name,
+    description_lines_count: '3',
     // tests
     // title_color: '008088',
     // text_color: '880800',
     // icon_color: '444000',
     // border_color: '202644',
     // bg_color: '202020',
-    // nice theme
-    title_color: 'af7aff',
-    text_color: 'e4e4e4',
-    icon_color: 'af7aff',
-    bg_color: '010101',
+
+    // nice black-purple theme
+    // title_color: 'af7aff',
+    // text_color: 'e4e4e4',
+    // icon_color: 'af7aff',
+    // bg_color: '010101',
+
+    // native approximation theme
+    title_color: 'f0f6fc',
+    text_color: 'f0f6fc',
+    icon_color: '238636', // I want it green
+    bg_color: '00000000',
+    hide_border: 'true',
   });
 
-  const { statusCode, body } = await request(repoPreviewSvgImageURL)
+  // const { statusCode, body } = await request(repoPreviewSvgImageURL)
 
-  if (statusCode !== 200)
-    throw new Error(`failed to fetch repo image for ${repoPreviewSvgImageURL}`);
+  // if (statusCode !== 200)
+  //   throw new Error(`failed to fetch repo image for ${repoPreviewSvgImageURL}`);
 
-  const text = (await body.text())
-    .replaceAll('#008088', 'var(--fgColor-default, var(--color-fg-default))')
-    .replaceAll('#880800', 'var(--fgColor-default, var(--color-fg-default))')
-    .replaceAll('#444000', 'var(--button-star-iconColor)')
-    .replaceAll('#202644', 'var(--borderColor-default,var(--color-border-default,#30363d))')
-    .replaceAll('#202020', 'var(--bgColor-default, var(--color-canvas-default))')
-    .replaceAll(/\s+/mg, ' ');
+  // const text = (await body.text())
+  //   .replaceAll('#008088', 'var(--fgColor-default, var(--color-fg-default))')
+  //   .replaceAll('#880800', 'var(--fgColor-default, var(--color-fg-default))')
+  //   .replaceAll('#444000', 'var(--button-star-iconColor)')
+  //   .replaceAll('#202644', 'var(--borderColor-default,var(--color-border-default,#30363d))')
+  //   .replaceAll('#202020', 'var(--bgColor-default, var(--color-canvas-default))')
+  //   .replaceAll(/\s+/mg, ' ');
 
-  console.log(repoPreviewSvgImageURL + '\n');
-  console.log(text + '\n');
+  // console.log(repoPreviewSvgImageURL + '\n');
+  // console.log(text + '\n');
   // await writeFile(`./images/${owner}_${name}.svg`, text);
 
   const repoURL = `https://github.com/${owner}/${name}`;
