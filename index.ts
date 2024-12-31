@@ -8,7 +8,7 @@ import {
   extractReposFromMarkdown,
   getEnvVarOrFail,
   renderMarkdownTableOfSmallStrings,
-  renderRepoToMarkdownBadge,
+  renderRepoToMarkdownPin,
   selfStarredReposOfUser,
   splitStringApart
 } from './src/index.js';
@@ -21,7 +21,7 @@ const README_FILE_PATH = 'README.md'
 // this is also a default environment variable provided by Github Action
 const REPO_OWNER = getEnvVarOrFail('GITHUB_REPOSITORY_OWNER');
 const AMOUNT_OF_COLUMNS = 3;
-// I'm okay with loosing less than 20 percent of badges
+// I'm okay with loosing less than 20% of pins
 const FATAL_PERCENT_OF_REPOS_LOST_DUE_TO_API_ERRORS = 80;
 
 const oldReadme = await readFile(README_FILE_PATH, 'utf8');
@@ -40,7 +40,7 @@ const {
 
 let delayedError: Error | null = null;
 const fetchedReposCreatedAndStarredByMe = [];
-const futureRepoBadges: Promise<string>[] = [];
+const futureRepoPins: Promise<string>[] = [];
 
 try {
   for await (const repo of (
@@ -54,7 +54,7 @@ try {
     console.log(`Found own starred repo: ${repo.name}`);
 
     fetchedReposCreatedAndStarredByMe.push(repo);
-    futureRepoBadges.push(renderRepoToMarkdownBadge(repo));
+    futureRepoPins.push(renderRepoToMarkdownPin(repo));
   }
 } catch (error) {
   const passesGracefulDegradationCondition = error instanceof RequestError
@@ -81,11 +81,11 @@ try {
   );
 }
 
-const repoBadges = await Promise.all(futureRepoBadges);
+const repoPins = await Promise.all(futureRepoPins);
 
 const newReadme = nonEditableTopPart
   + renderMarkdownTableOfSmallStrings(
-    repoBadges,
+    repoPins,
     AMOUNT_OF_COLUMNS
   )
   + nonEditableBottomPart;
