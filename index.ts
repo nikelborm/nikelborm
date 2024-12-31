@@ -43,14 +43,14 @@ const fetchedReposCreatedAndStarredByMe = [];
 const futureRepoPins: Promise<string>[] = [];
 
 try {
-  for await (const repo of (
-    process.env['MOCK_API'] === 'true'
-      ? [
-        { name: "apache-superset-quick-init", owner: REPO_OWNER },
-        { name: "download-github-folder", owner: REPO_OWNER },
-      ]
-      : selfStarredReposOfUser(REPO_OWNER)
-  )) {
+  const repos = process.env['MOCK_API'] === 'true'
+    ? [
+      { name: "apache-superset-quick-init", owner: REPO_OWNER },
+      { name: "download-github-folder", owner: REPO_OWNER },
+    ]
+    : selfStarredReposOfUser(REPO_OWNER);
+
+  for await (const repo of repos) {
     console.log(`Found own starred repo: ${repo.name}`);
 
     fetchedReposCreatedAndStarredByMe.push(repo);
