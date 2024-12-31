@@ -40,17 +40,17 @@ const {
 });
 
 let delayedError: Error | null = null;
-const fetchedReposCreatedByMe: IRepo[] = [];
+const fetchedReposCreatedAndStarredByMe: IRepo[] = [];
 
 try {
   for await (const { name } of selfStarredReposOfUser(REPO_OWNER)) {
     console.log(`Found own starred repo: ${name}`);
 
-    fetchedReposCreatedByMe.push({ name, owner: REPO_OWNER });
+    fetchedReposCreatedAndStarredByMe.push({ name, owner: REPO_OWNER });
   }
 } catch (error) {
   const passesGracefulDegradationCondition = error instanceof RequestError
-    && fetchedReposCreatedByMe.length > (
+    && fetchedReposCreatedAndStarredByMe.length > (
       extractReposFromMarkdown(oldEditablePart).length
         * FATAL_PERCENT_OF_REPOS_LOST_DUE_TO_API_ERRORS / 100
     );
@@ -74,10 +74,12 @@ try {
 }
 
 
-const repoBadges = await renderMarkdownRepoBadges(fetchedReposCreatedByMe);
+const repoBadges = await renderMarkdownRepoBadges(
+  fetchedReposCreatedAndStarredByMe
+);
 
 const newReadme = nonEditableTopPart
-  + await renderMarkdownTableOfSmallStrings(
+  + renderMarkdownTableOfSmallStrings(
     repoBadges,
     AMOUNT_OF_COLUMNS
   )

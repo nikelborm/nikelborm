@@ -1,4 +1,4 @@
-export async function renderMarkdownTableOfSmallStrings(smallStrings: string[], columnsAmount: number) {
+export function renderMarkdownTableOfSmallStrings(smallStrings: string[], columnsAmount: number) {
   if (smallStrings.some(s => s.includes("\n") || s.includes("\r")))
     throw new Error(
       "Strings passed to markdown table renderer cannot have newlines"
@@ -26,7 +26,7 @@ export async function renderMarkdownTableOfSmallStrings(smallStrings: string[], 
   ].join('\n');
 }
 
-async function renderRow(stringGroup: string[], columnsAmount: number) {
+function renderRow(stringGroup: string[], columnsAmount: number) {
   return Array
     .from(
       /* `columnsAmount` maintains amount of columns in cases when the group is half-full */
