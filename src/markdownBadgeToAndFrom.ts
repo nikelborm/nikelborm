@@ -2,6 +2,7 @@ import { IRepo } from './repo.interface.js';
 import { z } from 'zod';
 import { request } from 'undici';
 import { writeFile } from 'node:fs/promises';
+import { outdent } from 'outdent';
 
 export async function renderRepoToMarkdownBadge(
   { owner, name }: IRepo,
@@ -33,7 +34,7 @@ export async function renderRepoToMarkdownBadge(
     // icon_color: 'af7aff',
     // bg_color: '010101',
 
-    // native approximation theme
+    // native approximation dark theme (uses colors from CSS vars commented below)
     title_color: 'f0f6fc',
     text_color: 'f0f6fc',
     icon_color: '238636', // I want it green
@@ -44,10 +45,13 @@ export async function renderRepoToMarkdownBadge(
   console.log(`Started fetching ${sourceRepoPreviewSvgImageURL}`);
   const { statusCode, body } = await request(sourceRepoPreviewSvgImageURL)
 
-  if (statusCode !== 200)
-    throw new Error(`statusCode=${statusCode}: Failed to fetch repo image for ${sourceRepoPreviewSvgImageURL}`);
+  if (statusCode == 200)
+    console.log(`Fetched ${sourceRepoPreviewSvgImageURL}`);
+  else throw new Error(
+    `statusCode=${statusCode}: Failed to fetch repo image for ${sourceRepoPreviewSvgImageURL}`
+  );
 
-  const text = (await body.text())
+  const repoPreviewSvgImageDarkTheme = (await body.text())
     // .replaceAll('#008088', 'var(--fgColor-default, var(--color-fg-default))')
     // .replaceAll('#880800', 'var(--fgColor-default, var(--color-fg-default))')
     // .replaceAll('#444000', 'var(--button-star-iconColor)')
@@ -61,18 +65,36 @@ export async function renderRepoToMarkdownBadge(
     .replaceAll('viewBox="0 0 400 120"', 'viewBox="24 27 385 70"')
     .replaceAll(/\s+/mg, ' ');
 
-  const fileName = `./images/${owner}_${name}.svg`;
+  const repoPreviewSvgImageLightTheme = repoPreviewSvgImageDarkTheme
+    .replaceAll('#f0f6fc', '#1f2328');
 
-  await writeFile(fileName, text);
+  const imageFileNameDarkTheme = `./images/${owner}_${name}_dark_theme.svg`;
+  const imageFileNameLightTheme = `./images/${owner}_${name}_light_theme.svg`;
 
-  console.log(`Written file ${fileName} with transformed version of ${sourceRepoPreviewSvgImageURL}`);
+  await Promise.all([
+    writeFile(imageFileNameDarkTheme, repoPreviewSvgImageDarkTheme),
+    writeFile(imageFileNameLightTheme, repoPreviewSvgImageLightTheme),
+  ]);
+
+  console.log(outdent`
+    Written files:
+    1. ${imageFileNameDarkTheme}
+    2. ${imageFileNameLightTheme}
+    Those files are transformed versions of ${sourceRepoPreviewSvgImageURL}
+  `);
 
   const repoURL = `https://github.com/${owner}/${name}`;
 
-  const newRepoPreviewSvgImageURL = `https://raw.githubusercontent.com/${owner}/${owner}/refs/heads/main/${fileName}`
+  const prefixOfGitHubCDN = `https://raw.githubusercontent.com/${owner}/${owner}/refs/heads/main/`;
+
+  const newRepoPreviewSvgDarkThemeImageURL = prefixOfGitHubCDN + imageFileNameDarkTheme;
+  const newRepoPreviewSvgLightThemeImageURL = prefixOfGitHubCDN + imageFileNameLightTheme;
 
   // return `[![${name} repo](${sourceRepoPreviewSvgImageURL})](${repoURL})`;
-  return `[![${name} repo](${newRepoPreviewSvgImageURL})](${repoURL})`;
+  return outdent({ newline: '' })`
+    [![${name} repo](${newRepoPreviewSvgDarkThemeImageURL})](${repoURL + '#gh-dark-mode-only'})
+    [![${name} repo](${newRepoPreviewSvgLightThemeImageURL})](${repoURL + '#gh-light-mode-only'})
+  `;
 
   // return `<a href="${repoURL}">${text}</a>`
 }
