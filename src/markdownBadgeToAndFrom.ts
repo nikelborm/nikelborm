@@ -3,12 +3,6 @@ import { z } from 'zod';
 import { request } from 'undici';
 import { writeFile } from 'node:fs/promises';
 
-export function renderMarkdownRepoBadges(allRepos: IRepo[]) {
-  return Promise.all(allRepos.map(
-    renderRepoToMarkdownBadge
-  ));
-}
-
 export async function renderRepoToMarkdownBadge(
   { owner, name }: IRepo,
   /**
@@ -24,8 +18,9 @@ export async function renderRepoToMarkdownBadge(
   sourceRepoPreviewSvgImageURL.search = '?' + new URLSearchParams({
     username: owner,
     repo: name,
-    description_lines_count: '3',
-    // tests
+    // description_lines_count: '3',
+
+    // test theme
     // title_color: '008088',
     // text_color: '880800',
     // icon_color: '444000',

@@ -7,8 +7,6 @@ import { outdent } from 'outdent';
 import {
   extractReposFromMarkdown,
   getEnvVarOrFail,
-  IRepo,
-  renderMarkdownRepoBadges,
   renderMarkdownTableOfSmallStrings,
   renderRepoToMarkdownBadge,
   selfStarredReposOfUser,
