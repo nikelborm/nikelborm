@@ -1,7 +1,13 @@
 import { IRepo } from './repo.interface.js';
 import { z } from 'zod';
 
-export function renderRepoToMarkdownBadge(
+export function renderMarkdownRepoBadges(allRepos: IRepo[]) {
+  return Promise.all(allRepos.map(
+    renderRepoToMarkdownBadge
+  ));
+}
+
+export async function renderRepoToMarkdownBadge(
   { owner, name }: IRepo,
   /**
    * [Available Themes](https://github.com/anuraghazra/github-readme-stats/blob/master/themes/README.md)
