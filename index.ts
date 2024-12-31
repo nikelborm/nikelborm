@@ -2,6 +2,7 @@
 
 import '@total-typescript/ts-reset';
 import { readFile, writeFile } from 'node:fs/promises';
+import { RequestError } from "@octokit/request-error";
 import { outdent } from 'outdent';
 import {
   extractReposFromMarkdown,
@@ -37,24 +38,22 @@ const {
 });
 
 let delayedError: Error | null = null;
-const reposCreatedByMe: IRepo[] = [];
+const fetchedReposCreatedByMe: IRepo[] = [];
 
 try {
-  for await (const {
-    name,
-    owner: { login: owner }
-  } of selfStarredReposOfUser(REPO_OWNER)) {
+  for await (const { name } of selfStarredReposOfUser(REPO_OWNER)) {
     console.log(`Found own starred repo: ${name}`);
 
-    reposCreatedByMe.push({ name, owner });
+    fetchedReposCreatedByMe.push({ name, owner: REPO_OWNER });
   }
 } catch (error) {
-  const passesGracefulDegradationCondition = reposCreatedByMe.length > (
-    extractReposFromMarkdown(oldEditablePart).length
-      * FATAL_PERCENT_OF_REPOS_LOST_DUE_TO_API_ERRORS / 100
-  );
+  const passesGracefulDegradationCondition = error instanceof RequestError
+    && fetchedReposCreatedByMe.length > (
+      extractReposFromMarkdown(oldEditablePart).length
+        * FATAL_PERCENT_OF_REPOS_LOST_DUE_TO_API_ERRORS / 100
+    );
 
-  if (error instanceof Error && passesGracefulDegradationCondition) {
+  if (passesGracefulDegradationCondition) {
     console.error(outdent`
       An error was thrown during fetching data from Github API, but already
       fetched results will still be written to ${README_FILE_PATH} since condition
@@ -74,7 +73,7 @@ try {
 
 
 const newReadme = nonEditableTopPart
-  + renderReposTableToMarkdown(reposCreatedByMe, AMOUNT_OF_COLUMNS)
+  + renderReposTableToMarkdown(fetchedReposCreatedByMe, AMOUNT_OF_COLUMNS)
   + nonEditableBottomPart;
 
 await writeFile(README_FILE_PATH, newReadme);
