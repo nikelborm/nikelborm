@@ -100,17 +100,17 @@ futureRepoPins.sort((a, b) => {
   const templateToTop = -(+a.repo.isTemplate - +b.repo.isTemplate);
   if (templateToTop) return templateToTop;
 
-  const boilerplatesGoToTop = -(+a.repo.name.includes('boiler') - +b.repo.name.includes('boiler'));
-  if (boilerplatesGoToTop) return boilerplatesGoToTop;
+  const boilerplatesToTop = -(+a.repo.name.includes('boiler') - +b.repo.name.includes('boiler'));
+  if (boilerplatesToTop) return boilerplatesToTop;
 
   const archivedToBottom = (+a.repo.isItArchived - +b.repo.isItArchived);
   if (archivedToBottom) return archivedToBottom;
 
-  const hackathonsGoToBottom = (+a.repo.name.includes('hackathon') - +b.repo.name.includes('hackathon'));
-  if (hackathonsGoToBottom) return hackathonsGoToBottom;
+  const hackathonsToBottom = (+a.repo.name.includes('hackathon') - +b.repo.name.includes('hackathon'));
+  if (hackathonsToBottom) return hackathonsToBottom;
 
-  const experimentsGoToBottom = (+a.repo.name.includes('experiment') - +b.repo.name.includes('experiment'));
-  if (experimentsGoToBottom) return experimentsGoToBottom;
+  const experimentsToBottom = (+a.repo.name.includes('experiment') - +b.repo.name.includes('experiment'));
+  if (experimentsToBottom) return experimentsToBottom;
 
 
   // If you want manually sort them, you can do it, but that's unnecessary
