@@ -7,11 +7,54 @@ import { outdent } from 'outdent';
 type SmallRepo = Pick<IRepo, 'owner' | 'name'>;
 
 export async function renderRepoToMarkdownPin({ owner, name }: SmallRepo) {
+  if (process.env['SKIP_REFRESHING_IMAGES_FOLDER'] !== "true")
+    await refreshPinInImagesFolder({ owner, name });
+
+  // return `[![${name} repo](${sourceRepoPinURL})](${repoURL})`;
+  // return `<a href="${repoURL}">${text}</a>`
+  return ['dark', 'light'].map(theme =>
+    hidePinIfEnvSaysSo(theme, `[![${
+      name
+    } repo](https://raw.githubusercontent.com/${owner}/${
+      owner
+    }/refs/heads/main/images/${owner}_${name}_${
+      theme
+    }_theme.svg)](https://github.com/${owner}/${name}#gh-${
+      theme
+    }-mode-only)`)
+  ).join('');
+}
+
+async function refreshPinInImagesFolder({ owner, name }: SmallRepo) {
   const {
     originalRepoPinSVG,
     originalRepoPinURL
   } = await fetchOriginalRepoPin({ owner, name });
+  console.log(`Fetched original repo pin { owner:"${owner}", name:"${name}" }`);
 
+  const {
+    repoPinDarkThemeSVG,
+    repoPinLightThemeSVG
+  } = getScaledRepaintedRepoPins(originalRepoPinSVG);
+
+  const repoPinDarkThemeFilePath = `images/${owner}_${name}_dark_theme.svg`;
+  const repoPinLightThemeFilePath = `images/${owner}_${name}_light_theme.svg`;
+
+  await Promise.all([
+    writeFile(repoPinDarkThemeFilePath,  repoPinDarkThemeSVG),
+    writeFile(repoPinLightThemeFilePath, repoPinLightThemeSVG),
+  ]);
+
+  console.log(outdent`
+    Written files:
+    1. ${repoPinDarkThemeFilePath}
+    2. ${repoPinLightThemeFilePath}
+    Those files are transformed versions of ${originalRepoPinURL}\n
+  `);
+}
+
+
+function getScaledRepaintedRepoPins(originalRepoPinSVG: string) {
   const repoPinDarkThemeSVG = originalRepoPinSVG
     // .replaceAll('#008088', /* title_color  */ 'var(--fgColor-default, var(--color-fg-default))')
     // .replaceAll('#880800', /* text_color   */ 'var(--fgColor-default, var(--color-fg-default))')
@@ -29,38 +72,11 @@ export async function renderRepoToMarkdownPin({ owner, name }: SmallRepo) {
   const repoPinLightThemeSVG = repoPinDarkThemeSVG
     .replaceAll('#f0f6fc', '#1f2328');
 
-  const repoPinDarkThemeFilePath = `images/${owner}_${name}_dark_theme.svg`;
-  const repoPinLightThemeFilePath = `images/${owner}_${name}_light_theme.svg`;
-
-  await Promise.all([
-    writeFile(repoPinDarkThemeFilePath,  repoPinDarkThemeSVG),
-    writeFile(repoPinLightThemeFilePath, repoPinLightThemeSVG),
-  ]);
-
-  console.log(outdent`
-    Written files:
-    1. ${repoPinDarkThemeFilePath}
-    2. ${repoPinLightThemeFilePath}
-    Those files are transformed versions of ${originalRepoPinURL}\n
-  `);
-
-  const repoURL = `https://github.com/${owner}/${name}`;
-  const prefixOfGitHubCDN = `https://raw.githubusercontent.com/${owner}/${owner}/refs/heads/main/`;
-
-  // return `[![${name} repo](${sourceRepoPinURL})](${repoURL})`;
-  const repoPinDarkThemeMarkDown  = `[![${name} repo](${
-    prefixOfGitHubCDN + repoPinDarkThemeFilePath
-  })](${repoURL + '#gh-dark-mode-only'})`;
-  const repoPinLightThemeMarkDown = `[![${name} repo](${
-    prefixOfGitHubCDN + repoPinLightThemeFilePath
-  })](${repoURL + '#gh-light-mode-only'})`;
-
-  return hidePinIfEnvSaysSo('dark', repoPinDarkThemeMarkDown)
-    + hidePinIfEnvSaysSo('light', repoPinLightThemeMarkDown);
-
-  // return `<a href="${repoURL}">${text}</a>`
+  return {
+    repoPinDarkThemeSVG,
+    repoPinLightThemeSVG
+  };
 }
-
 
 async function fetchOriginalRepoPin({ owner, name }: SmallRepo) {
   const originalRepoPinURL = new URL(
@@ -95,14 +111,12 @@ async function fetchOriginalRepoPin({ owner, name }: SmallRepo) {
     hide_border: 'true',
   });
 
-  console.log(`Started fetching ${originalRepoPinURL}`);
+  console.log(`Started fetching repo pin { owner:"${owner}", name:"${name}" }`);
   const { statusCode, body } = await request(originalRepoPinURL)
 
   if (statusCode !== 200) throw new Error(
     `statusCode=${statusCode}: Failed to fetch repo pin image for ${originalRepoPinURL}`
   );
-
-  console.log(`Fetched ${originalRepoPinURL}`);
 
   return {
     originalRepoPinURL,
