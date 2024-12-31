@@ -34,9 +34,15 @@ jobs:
         run: |
           ./dist/index.js
       -
-        name: Commit updated README.md and potentially updated package-lock.json after npm install
+        name: Commit updated README.md, images, package-lock.json if changed
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_author: 'nikelborm <evadev@duck.com>'
           file_pattern: 'README.md package-lock.json images'
           commit_message: Auto-updated README.md
+      -
+        name: Preserve self starred repos list
+        uses: actions/upload-artifact@v4
+        with:
+          name: Repos created and starred by me
+          path: ./reposCreatedAndStarredByMe.json
