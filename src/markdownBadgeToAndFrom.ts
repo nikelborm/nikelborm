@@ -1,6 +1,5 @@
 import { IRepo } from './repo.interface.js';
 import { z } from 'zod';
-import type { RequestError } from "@octokit/request-error";
 
 export function renderRepoToMarkdownBadge(
   { owner, name }: IRepo,
