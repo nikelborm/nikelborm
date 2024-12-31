@@ -52,6 +52,9 @@ function renderRepoToMarkdownBadge(
     bg_color: '010101',
   })
 
+  // border color
+  // var(--borderColor-default,var(--color-border-default,#30363d))
+
   const repoURL = `https://github.com/${owner}/${name}`;
 
   return `[![${name} repo](${repoSvgImageURL})](${repoURL})`;
