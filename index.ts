@@ -43,11 +43,11 @@ let delayedError: Error | null = null;
 const fetchedReposCreatedAndStarredByMe: IRepo[] = [];
 
 try {
-  // for await (const { name } of selfStarredReposOfUser(REPO_OWNER)) {
-  //   console.log(`Found own starred repo: ${name}`);
+  for await (const { name } of selfStarredReposOfUser(REPO_OWNER)) {
+    console.log(`Found own starred repo: ${name}`);
 
-  //   fetchedReposCreatedAndStarredByMe.push({ name, owner: REPO_OWNER });
-  // }
+    fetchedReposCreatedAndStarredByMe.push({ name, owner: REPO_OWNER });
+  }
 } catch (error) {
   const passesGracefulDegradationCondition = error instanceof RequestError
     && fetchedReposCreatedAndStarredByMe.length > (
