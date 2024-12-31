@@ -26,6 +26,6 @@ export async function* selfStarredReposOfUser(username: string) {
 
   // So I chose the second way.
   for await (const repo of starredReposOfUser(username, 100)) {
-    if(repo.owner.login === username) yield repo
+    if (repo.owner.login === username) yield repo
   }
 }

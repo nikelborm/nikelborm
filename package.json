@@ -13,6 +13,7 @@
     "@octokit/core": "^6.1.2",
     "outdent": "^0.8.0",
     "parse-link-header": "^2.0.0",
+    "undici": "^7.2.0",
     "zod": "^3.24.1"
   },
   "devDependencies": {

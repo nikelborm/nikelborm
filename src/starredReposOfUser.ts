@@ -8,7 +8,8 @@ export async function* starredReposOfUser(username: string, per_page: number) {
   if (per_page <= 0 || per_page > 100) throw new Error(
     'Function statsOfUsers accepts only 0 < per_page <= 100'
   );
-  if(!username) throw new Error(
+
+  if (!username) throw new Error(
     'Function statsOfUsers accepts only non-empty strings as username'
   );
 
@@ -17,8 +18,11 @@ export async function* starredReposOfUser(username: string, per_page: number) {
   let sentAmountOfRequests = 0;
   let doAnotherStep = true;
 
+  console.log(`Started fetching pages of ${username}'s starred repos`);
+
   while (doAnotherStep && sentAmountOfRequests < SENT_TOO_MUCH_REQUESTS_AMOUNT) {
     sentAmountOfRequests += 1;
+
     const response = await octokit.request('GET /users/{username}/starred', {
       username,
       per_page,
@@ -29,7 +33,8 @@ export async function* starredReposOfUser(username: string, per_page: number) {
         'X-GitHub-Api-Version': '2022-11-28'
       },
     });
-    process.stdout.write(`Fetched page ${sentAmountOfRequests} of ${username}'s starred repos`);
+
+    process.stdout.write(`Fetched ${sentAmountOfRequests}`);
 
     const linkHeader = parseLinkHeader(response.headers.link);
 

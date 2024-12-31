@@ -43,11 +43,11 @@ let delayedError: Error | null = null;
 const fetchedReposCreatedAndStarredByMe: IRepo[] = [];
 
 try {
-  for await (const { name } of selfStarredReposOfUser(REPO_OWNER)) {
-    console.log(`Found own starred repo: ${name}`);
+  // for await (const { name } of selfStarredReposOfUser(REPO_OWNER)) {
+  //   console.log(`Found own starred repo: ${name}`);
 
-    fetchedReposCreatedAndStarredByMe.push({ name, owner: REPO_OWNER });
-  }
+  //   fetchedReposCreatedAndStarredByMe.push({ name, owner: REPO_OWNER });
+  // }
 } catch (error) {
   const passesGracefulDegradationCondition = error instanceof RequestError
     && fetchedReposCreatedAndStarredByMe.length > (
@@ -75,7 +75,11 @@ try {
 
 
 const repoBadges = await renderMarkdownRepoBadges(
-  fetchedReposCreatedAndStarredByMe
+  // fetchedReposCreatedAndStarredByMe
+  [
+    { name: "apache-superset-quick-init", owner: REPO_OWNER },
+    { name: "download-github-folder", owner: REPO_OWNER },
+  ]
 );
 
 const newReadme = nonEditableTopPart
