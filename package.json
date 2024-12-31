@@ -19,10 +19,10 @@
     "@total-typescript/ts-reset": "^0.5.1",
     "@types/node": "^22.10.2",
     "@types/parse-link-header": "^2.0.3",
-    "@vercel/ncc": "^0.38.1",
+    "@vercel/ncc": "^0.38.3",
     "rimraf": "^6.0.1",
-    "tsx": "^4.13.2",
-    "typescript": "^5.4.5"
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2"
   },
   "keywords": [],
   "homepage": "https://github.com/nikelborm",

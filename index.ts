@@ -8,10 +8,12 @@ import {
   extractReposFromMarkdown,
   getEnvVarOrFail,
   IRepo,
-  renderReposTableToMarkdown,
+  renderMarkdownRepoBadges,
+  renderMarkdownTableOfSmallStrings,
   selfStarredReposOfUser,
   splitStringApart
 } from './src/index.js';
+import { format } from 'node:util';
 
 // const THEME = 'vision-friendly-dark'
 const START_TOKEN = '<!-- REPO-TABLE-INJECT-START -->';
@@ -56,24 +58,29 @@ try {
   if (passesGracefulDegradationCondition) {
     console.error(outdent`
       An error was thrown during fetching data from Github API, but already
-      fetched results will still be written to ${README_FILE_PATH} since condition
+      fetched results will still be written to %s since condition
       for graceful degradation was met. It means that before failing, API
-      returned more than ${FATAL_PERCENT_OF_REPOS_LOST_DUE_TO_API_ERRORS}% of the repos relative to previous CI run.
-    `);
+      returned more than %s%% of the repos relative to previous CI run.
+    `, README_FILE_PATH, FATAL_PERCENT_OF_REPOS_LOST_DUE_TO_API_ERRORS);
     delayedError = error;
   } else throw new Error(
-    outdent`
+    format(outdent`
       There was an error during fetching data from Github API and condition
       for graceful degradation wasn't met. It means that before failing API
-      returned LESS than ${FATAL_PERCENT_OF_REPOS_LOST_DUE_TO_API_ERRORS}% of the repos relative to previous CI run.
-    `,
+      returned LESS than %s%% of the repos relative to previous CI run.
+    `, FATAL_PERCENT_OF_REPOS_LOST_DUE_TO_API_ERRORS),
     { cause: error }
   );
 }
 
 
+const repoBadges = await renderMarkdownRepoBadges(fetchedReposCreatedByMe);
+
 const newReadme = nonEditableTopPart
-  + renderReposTableToMarkdown(fetchedReposCreatedByMe, AMOUNT_OF_COLUMNS)
+  + await renderMarkdownTableOfSmallStrings(
+    repoBadges,
+    AMOUNT_OF_COLUMNS
+  )
   + nonEditableBottomPart;
 
 await writeFile(README_FILE_PATH, newReadme);
