@@ -13,7 +13,7 @@
         <style>
           .header {
             font: 600 18px 'Segoe UI', Ubuntu, Sans-Serif;
-            fill: #var(--fgColor-default, var(--color-fg-default));
+            fill: var(--fgColor-default, var(--color-fg-default));
             animation: fadeInAnimation 0.8s ease-in-out forwards;
           }
           @supports(-moz-appearance: auto) {
@@ -21,9 +21,9 @@
             .header { font-size: 15.5px; }
           }
           
-    .description { font: 400 13px 'Segoe UI', Ubuntu, Sans-Serif; fill: #var(--fgColor-default, var(--color-fg-default)) }
-    .gray { font: 400 12px 'Segoe UI', Ubuntu, Sans-Serif; fill: #var(--fgColor-default, var(--color-fg-default)) }
-    .icon { fill: #var(--button-star-iconColor) }
+    .description { font: 400 13px 'Segoe UI', Ubuntu, Sans-Serif; fill: var(--fgColor-default, var(--color-fg-default)) }
+    .gray { font: 400 12px 'Segoe UI', Ubuntu, Sans-Serif; fill: var(--fgColor-default, var(--color-fg-default)) }
+    .icon { fill: var(--button-star-iconColor) }
     .badge { font: 600 11px 'Segoe UI', Ubuntu, Sans-Serif; }
     .badge rect { opacity: 0.2 }
   
@@ -58,9 +58,9 @@
           y="0.5"
           rx="4.5"
           height="99%"
-          stroke="#var(--borderColor-default,var(--color-border-default,#30363d))"
+          stroke="var(--borderColor-default,var(--color-border-default,#30363d))"
           width="399"
-          fill="#var(--bgColor-default, var(--color-canvas-default))"
+          fill="var(--bgColor-default, var(--color-canvas-default))"
           stroke-opacity="1"
         />
 
