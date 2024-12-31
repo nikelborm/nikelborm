@@ -1,5 +1,6 @@
 import { IRepo } from './repo.interface.js';
 import { z } from 'zod';
+import type { RequestError } from "@octokit/request-error";
 
 export function renderRepoToMarkdownBadge(
   { owner, name }: IRepo,
@@ -31,6 +32,18 @@ export function renderRepoToMarkdownBadge(
 
   // border color
   // var(--borderColor-default,var(--color-border-default,#30363d))
+
+  // title color
+  // var(--fgColor-default, var(--color-fg-default))
+
+  // text color
+  // var(--fgColor-default, var(--color-fg-default))
+
+  // icon color
+  // var(--button-star-iconColor)
+
+  // background color
+  // var(--bgColor-default, var(--color-canvas-default))
 
   const repoURL = `https://github.com/${owner}/${name}`;
 
