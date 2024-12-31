@@ -53,8 +53,13 @@ export async function renderRepoToMarkdownBadge(
     // .replaceAll('#444000', 'var(--button-star-iconColor)')
     // .replaceAll('#202644', 'var(--borderColor-default,var(--color-border-default,#30363d))')
     // .replaceAll('#202020', 'var(--bgColor-default, var(--color-canvas-default))')
-    .replaceAll(/\s+/mg, ' ')
-    .replaceAll('viewBox="0 0 400 150"', 'viewBox="24 27 376 123"');
+    .replaceAll('height="150"', 'height="115"')
+    .replaceAll('height="140"', 'height="105"')
+    .replaceAll('height="120"', 'height="85"')
+    .replaceAll('viewBox="0 0 400 150"', 'viewBox="24 27 385 100"')
+    .replaceAll('viewBox="0 0 400 140"', 'viewBox="24 27 385 90"')
+    .replaceAll('viewBox="0 0 400 120"', 'viewBox="24 27 385 70"')
+    .replaceAll(/\s+/mg, ' ');
 
   const fileName = `./images/${owner}_${name}.svg`;
 
