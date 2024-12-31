@@ -38,5 +38,5 @@ jobs:
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_author: 'nikelborm <evadev@duck.com>'
-          file_pattern: 'README.md package-lock.json'
+          file_pattern: 'README.md package-lock.json images'
           commit_message: Auto-updated README.md
