@@ -12,7 +12,7 @@ export async function renderRepoToMarkdownPin({ owner, name }: SmallRepo) {
     originalRepoPinURL
   } = await fetchOriginalRepoPin({ owner, name });
 
-  const repoPreviewSvgImageDarkTheme = originalRepoPinSVG
+  const repoPinDarkThemeSVG = originalRepoPinSVG
     // .replaceAll('#008088', /* title_color  */ 'var(--fgColor-default, var(--color-fg-default))')
     // .replaceAll('#880800', /* text_color   */ 'var(--fgColor-default, var(--color-fg-default))')
     // .replaceAll('#444000', /* icon_color   */ 'var(--button-star-iconColor)')
@@ -26,36 +26,37 @@ export async function renderRepoToMarkdownPin({ owner, name }: SmallRepo) {
     .replaceAll('viewBox="0 0 400 120"', 'viewBox="24 27 385 70"')
     .replaceAll(/\s+/mg, ' ');
 
-  const repoPreviewSvgImageLightTheme = repoPreviewSvgImageDarkTheme
+  const repoPinLightThemeSVG = repoPinDarkThemeSVG
     .replaceAll('#f0f6fc', '#1f2328');
 
-  const imageFileNameDarkTheme = `./images/${owner}_${name}_dark_theme.svg`;
-  const imageFileNameLightTheme = `./images/${owner}_${name}_light_theme.svg`;
+  const repoPinDarkThemeFilePath = `images/${owner}_${name}_dark_theme.svg`;
+  const repoPinLightThemeFilePath = `images/${owner}_${name}_light_theme.svg`;
 
   await Promise.all([
-    writeFile(imageFileNameDarkTheme, repoPreviewSvgImageDarkTheme),
-    writeFile(imageFileNameLightTheme, repoPreviewSvgImageLightTheme),
+    writeFile(repoPinDarkThemeFilePath,  repoPinDarkThemeSVG),
+    writeFile(repoPinLightThemeFilePath, repoPinLightThemeSVG),
   ]);
 
   console.log(outdent`
     Written files:
-    1. ${imageFileNameDarkTheme}
-    2. ${imageFileNameLightTheme}
+    1. ${repoPinDarkThemeFilePath}
+    2. ${repoPinLightThemeFilePath}
     Those files are transformed versions of ${originalRepoPinURL}\n
   `);
 
   const repoURL = `https://github.com/${owner}/${name}`;
-
   const prefixOfGitHubCDN = `https://raw.githubusercontent.com/${owner}/${owner}/refs/heads/main/`;
 
-  const newDarkThemeRepoPinURL = prefixOfGitHubCDN + imageFileNameDarkTheme;
-  const newLightThemeRepoPinURL = prefixOfGitHubCDN + imageFileNameLightTheme;
-
   // return `[![${name} repo](${sourceRepoPinURL})](${repoURL})`;
-  return outdent({ newline: '' })`
-    [![${name} repo](${newDarkThemeRepoPinURL})](${repoURL + '#gh-dark-mode-only'})
-    [![${name} repo](${newLightThemeRepoPinURL})](${repoURL + '#gh-light-mode-only'})
-  `;
+  const repoPinDarkThemeMarkDown  = `[![${name} repo](${
+    prefixOfGitHubCDN + repoPinDarkThemeFilePath
+  })](${repoURL + '#gh-dark-mode-only'})`;
+  const repoPinLightThemeMarkDown = `[![${name} repo](${
+    prefixOfGitHubCDN + repoPinLightThemeFilePath
+  })](${repoURL + '#gh-light-mode-only'})`;
+
+  return hidePinIfEnvSaysSo('dark', repoPinDarkThemeMarkDown)
+    + hidePinIfEnvSaysSo('light', repoPinLightThemeMarkDown);
 
   // return `<a href="${repoURL}">${text}</a>`
 }
@@ -125,3 +126,9 @@ export function extractReposFromMarkdown(markdownText: string) {
 
   return MarkdownRepoPinZodSchema.parse(markdownRepoPins);
 }
+
+const hidePinIfEnvSaysSo = (theme: string, pin: string) =>
+  [theme, "", undefined, null, 'both', 'null', 'any', 'all', 'every', 'each']
+    .includes(process.env['RENDER_ONLY_THEME'])
+  ? pin
+  : '';

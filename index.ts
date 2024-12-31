@@ -1,8 +1,9 @@
 #!/usr/bin/env node
 
+import { RequestError } from "@octokit/request-error";
 import '@total-typescript/ts-reset';
 import { readFile, writeFile } from 'node:fs/promises';
-import { RequestError } from "@octokit/request-error";
+import { format } from 'node:util';
 import { outdent } from 'outdent';
 import {
   extractReposFromMarkdown,
@@ -14,7 +15,7 @@ import {
   selfStarredReposOfUser,
   splitStringApart
 } from './src/index.js';
-import { format } from 'node:util';
+
 
 const START_TOKEN = '<!-- REPO-TABLE-INJECT-START -->';
 const END_TOKEN = '<!-- REPO-TABLE-INJECT-END -->';
