@@ -52,13 +52,13 @@ export async function renderRepoToMarkdownBadge(
 
   console.log(repoPreviewSvgImageURL + '\n');
   console.log(text + '\n');
-  await writeFile(`./images/${owner}_${name}.svg`, text);
+  // await writeFile(`./images/${owner}_${name}.svg`, text);
 
   const repoURL = `https://github.com/${owner}/${name}`;
 
-  // return `[![${name} repo](./images/${owner}_${name}.svg)](${repoURL})`;
+  return `[![${name} repo](./images/${owner}_${name}.svg)](${repoURL})`;
 
-  return `<a href="${repoURL}">${text}</a>`
+  // return `<a href="${repoURL}">${text}</a>`
 
 }
 
