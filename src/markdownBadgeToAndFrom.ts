@@ -16,12 +16,12 @@ export async function renderRepoToMarkdownBadge(
    */
   // theme: string
 ) {
-  const repoPreviewSvgImageURL = new URL(
+  const sourceRepoPreviewSvgImageURL = new URL(
     'api/pin',
     'https://github-readme-stats.vercel.app',
   );
 
-  repoPreviewSvgImageURL.search = '?' + new URLSearchParams({
+  sourceRepoPreviewSvgImageURL.search = '?' + new URLSearchParams({
     username: owner,
     repo: name,
     description_lines_count: '3',
@@ -46,27 +46,33 @@ export async function renderRepoToMarkdownBadge(
     hide_border: 'true',
   });
 
-  // const { statusCode, body } = await request(repoPreviewSvgImageURL)
+  console.log(`Started fetching ${sourceRepoPreviewSvgImageURL}`);
+  const { statusCode, body } = await request(sourceRepoPreviewSvgImageURL)
 
-  // if (statusCode !== 200)
-  //   throw new Error(`failed to fetch repo image for ${repoPreviewSvgImageURL}`);
+  if (statusCode !== 200)
+    throw new Error(`statusCode=${statusCode}: Failed to fetch repo image for ${sourceRepoPreviewSvgImageURL}`);
 
-  // const text = (await body.text())
-  //   .replaceAll('#008088', 'var(--fgColor-default, var(--color-fg-default))')
-  //   .replaceAll('#880800', 'var(--fgColor-default, var(--color-fg-default))')
-  //   .replaceAll('#444000', 'var(--button-star-iconColor)')
-  //   .replaceAll('#202644', 'var(--borderColor-default,var(--color-border-default,#30363d))')
-  //   .replaceAll('#202020', 'var(--bgColor-default, var(--color-canvas-default))')
-  //   .replaceAll(/\s+/mg, ' ');
+  const text = (await body.text())
+    // .replaceAll('#008088', 'var(--fgColor-default, var(--color-fg-default))')
+    // .replaceAll('#880800', 'var(--fgColor-default, var(--color-fg-default))')
+    // .replaceAll('#444000', 'var(--button-star-iconColor)')
+    // .replaceAll('#202644', 'var(--borderColor-default,var(--color-border-default,#30363d))')
+    // .replaceAll('#202020', 'var(--bgColor-default, var(--color-canvas-default))')
+    .replaceAll(/\s+/mg, ' ')
+    .replaceAll('viewBox="0 0 400 150"', 'viewBox="24 27 376 123"');
 
-  // console.log(repoPreviewSvgImageURL + '\n');
-  // console.log(text + '\n');
-  // await writeFile(`./images/${owner}_${name}.svg`, text);
+  const fileName = `./images/${owner}_${name}.svg`;
+
+  await writeFile(fileName, text);
+
+  console.log(`Written file ${fileName} with transformed version of ${sourceRepoPreviewSvgImageURL}`);
 
   const repoURL = `https://github.com/${owner}/${name}`;
 
-  return `[![${name} repo](${repoPreviewSvgImageURL})](${repoURL})`;
-  // return `[![${name} repo](./images/${owner}_${name}.svg)](${repoURL})`;
+  const newRepoPreviewSvgImageURL = `https://raw.githubusercontent.com/${owner}/${owner}/refs/heads/main/${fileName}`
+
+  // return `[![${name} repo](${sourceRepoPreviewSvgImageURL})](${repoURL})`;
+  return `[![${name} repo](${newRepoPreviewSvgImageURL})](${repoURL})`;
 
   // return `<a href="${repoURL}">${text}</a>`
 }
