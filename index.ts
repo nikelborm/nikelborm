@@ -22,7 +22,7 @@ const END_TOKEN = '<!-- REPO-TABLE-INJECT-END -->';
 const README_FILE_PATH = 'README.md';
 // this is also a default environment variable provided by Github Action
 const REPO_OWNER = getEnvVarOrFail('GITHUB_REPOSITORY_OWNER');
-const AMOUNT_OF_COLUMNS = 3;
+const AMOUNT_OF_COLUMNS = 2;
 // I'm okay with loosing less than 20% of pins due to reaching rate limits
 const FATAL_PERCENT_OF_REPOS_LOST_DUE_TO_API_ERRORS = 80;
 
@@ -42,20 +42,28 @@ const {
 
 let delayedError: Error | null = null;
 
-const futureRepoPins: { repo: IRepo, pin: Promise<string>}[] = [];
+const futureRepoPins: {
+  repo: IRepo,
+  pin: Promise<string>,
+  lastUpdateIndex: number
+}[] = [];
 
 try {
   const repos = process.env['MOCK_API'] === 'true'
-    ? await getMockRepos()
+    ? await getMockRepos(REPO_OWNER)
     : selfStarredReposOfUser(REPO_OWNER);
 
+  let lastUpdateIndex = 0;
   for await (const repo of repos) {
-    console.log(`Found own starred repo: ${repo.name}`);
+    console.log(`Found own starred repo: ${repo.name}, ${repo.lastTimeBeenPushedInto}`);
 
     futureRepoPins.push({
       repo,
+      lastUpdateIndex,
       pin: renderRepoToMarkdownPin(repo)
     });
+
+    lastUpdateIndex += 1;
   }
 } catch (error) {
   const passesGracefulDegradationCondition = error instanceof RequestError
@@ -82,12 +90,39 @@ try {
   );
 }
 
-await writeFile(
-  './reposCreatedAndStarredByMe.json',
-  JSON.stringify(futureRepoPins.map(_ => _.repo))
-);
+if (process.env['MOCK_API'] !== 'true')
+  await writeFile(
+    './reposCreatedAndStarredByMe.json',
+    JSON.stringify(futureRepoPins.map(_ => _.repo))
+  );
 
-// futureRepoPins.sort((a, b) => {})
+futureRepoPins.sort((a, b) => {
+  const templateToTop = -(+a.repo.isTemplate - +b.repo.isTemplate);
+  if (templateToTop) return templateToTop;
+
+  const boilerplatesGoToTop = -(+a.repo.name.includes('boiler') - +b.repo.name.includes('boiler'));
+  if (boilerplatesGoToTop) return boilerplatesGoToTop;
+
+  const archivedToBottom = (+a.repo.isItArchived - +b.repo.isItArchived);
+  if (archivedToBottom) return archivedToBottom;
+
+  const hackathonsGoToBottom = (+a.repo.name.includes('hackathon') - +b.repo.name.includes('hackathon'));
+  if (hackathonsGoToBottom) return hackathonsGoToBottom;
+
+  const experimentsGoToBottom = (+a.repo.name.includes('experiment') - +b.repo.name.includes('experiment'));
+  if (experimentsGoToBottom) return experimentsGoToBottom;
+
+
+  // If you want manually sort them, you can do it, but that's unnecessary
+  // because they already come pre-ordered using lastUpdateIndex
+  // const lastPushedToTop = -(+(a.repo.lastTimeBeenPushedInto ?? 0) - +(b.repo.lastTimeBeenPushedInto ?? 0));
+  // if (lastPushedToTop) return lastPushedToTop; // null goes to bottom
+
+  const lastUpdatedToTop = (a.lastUpdateIndex - b.lastUpdateIndex);
+  if (lastUpdatedToTop) return lastUpdatedToTop;
+
+  return 0;
+})
 
 const repoPins = await Promise.all(
   futureRepoPins.map(_ => _.pin)

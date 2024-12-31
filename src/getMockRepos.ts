@@ -1,25 +1,21 @@
 import { readFile } from 'node:fs/promises';
-import { IRepo } from './repo.interface.js';
+import { IRepo, RepoZodSchema } from './repo.interface.js';
 
-export async function getMockRepos() {
+export async function getMockRepos(owner: string) {
   try {
-    return (JSON.parse( /* searches for this file relative to CWD */
-      await readFile('./reposCreatedAndStarredByMe.json', 'utf-8')
-    ) as IRepo[])
-      .map(({ lastTimeBeenPushedInto, ...rest }) => ({
-        ...rest,
-        lastTimeBeenPushedInto: lastTimeBeenPushedInto
-          ? new Date(lastTimeBeenPushedInto)
-          : null
-      }));
+    const fileContents = await readFile('./reposCreatedAndStarredByMe.json', 'utf-8');
+    /* searches for this file relative to CWD */
+
+    return RepoZodSchema.array().parse(JSON.parse(fileContents));
   } catch (error) {
+    console.error("Error while loading ./reposCreatedAndStarredByMe.json. Falling back to primitive mock", error)
     return ["apache-superset-quick-init", "download-github-folder"]
       .map(name => ({
         name,
         isItArchived: false,
         isTemplate: false,
         lastTimeBeenPushedInto: new Date(),
-        owner: 'mock'
+        owner
       }))
   }
 }
