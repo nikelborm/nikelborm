@@ -7,7 +7,7 @@ on:
     - cron: '0 0 */5 * *' # every 5 days at 00:00
 
 jobs:
-  build:
+  update_stars_in_readme:
     permissions:
       contents: write
     runs-on: ubuntu-latest
