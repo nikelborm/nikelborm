@@ -10,6 +10,7 @@ import {
   IRepo,
   renderMarkdownRepoBadges,
   renderMarkdownTableOfSmallStrings,
+  renderRepoToMarkdownBadge,
   selfStarredReposOfUser,
   splitStringApart
 } from './src/index.js';
@@ -21,7 +22,7 @@ const END_TOKEN = '<!-- REPO-TABLE-INJECT-END -->';
 const README_FILE_PATH = 'README.md'
 // this is also a default environment variable provided by Github Action
 const REPO_OWNER = getEnvVarOrFail('GITHUB_REPOSITORY_OWNER');
-const AMOUNT_OF_COLUMNS = 2;
+const AMOUNT_OF_COLUMNS = 3;
 // I'm okay with loosing less than 20 percent of badges
 const FATAL_PERCENT_OF_REPOS_LOST_DUE_TO_API_ERRORS = 80;
 
@@ -41,20 +42,25 @@ const {
 
 let delayedError: Error | null = null;
 
-const fetchedReposCreatedAndStarredByMe: IRepo[] = process.env['MOCK_API'] === 'true'
+const fetchedReposCreatedAndStarredByMe = process.env['MOCK_API'] === 'true'
   ? [
     { name: "apache-superset-quick-init", owner: REPO_OWNER },
     { name: "download-github-folder", owner: REPO_OWNER },
   ]
   : []
 
-fetch_api_data: try {
-  if (fetchedReposCreatedAndStarredByMe.length) break fetch_api_data;
+const futureRepoBadges: Promise<string>[] = [];
 
-  for await (const { name } of selfStarredReposOfUser(REPO_OWNER)) {
-    console.log(`Found own starred repo: ${name}`);
+try {
+  for await (const repo of (
+    fetchedReposCreatedAndStarredByMe.length
+      ? fetchedReposCreatedAndStarredByMe
+      : selfStarredReposOfUser(REPO_OWNER)
+  )) {
+    console.log(`Found own starred repo: ${repo.name}`);
 
-    fetchedReposCreatedAndStarredByMe.push({ name, owner: REPO_OWNER });
+    fetchedReposCreatedAndStarredByMe.push(repo);
+    futureRepoBadges.push(renderRepoToMarkdownBadge(repo));
   }
 } catch (error) {
   const passesGracefulDegradationCondition = error instanceof RequestError
@@ -81,10 +87,7 @@ fetch_api_data: try {
   );
 }
 
-
-const repoBadges = await renderMarkdownRepoBadges(
-  fetchedReposCreatedAndStarredByMe
-);
+const repoBadges = await Promise.all(futureRepoBadges);
 
 const newReadme = nonEditableTopPart
   + renderMarkdownTableOfSmallStrings(

@@ -1,5 +1,6 @@
 import { Octokit } from '@octokit/core';
 import { parseLinkHeader } from './parseLinkHeader.js';
+import { IRepo } from './repo.interface.js';
 
 // Self imposed restriction to exit infinite loops
 const SENT_TOO_MUCH_REQUESTS_AMOUNT = 50;
@@ -43,7 +44,11 @@ export async function* starredReposOfUser(username: string, per_page: number) {
     console.log( lastPage ? ` out of ${lastPage} pages` : ` pages`);
 
     for (const elem of response.data) {
-      yield 'repo' in elem ? elem.repo : elem;
+      const repo = 'repo' in elem ? elem.repo : elem;
+      yield {
+        name: repo.name,
+        owner: repo.owner.login,
+      } satisfies IRepo
     }
 
     doAnotherStep = !!linkHeader.next?.url;
