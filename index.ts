@@ -40,9 +40,17 @@ const {
 });
 
 let delayedError: Error | null = null;
-const fetchedReposCreatedAndStarredByMe: IRepo[] = [];
 
-try {
+const fetchedReposCreatedAndStarredByMe: IRepo[] = process.env['MOCK_API'] === 'true'
+  ? [
+    { name: "apache-superset-quick-init", owner: REPO_OWNER },
+    { name: "download-github-folder", owner: REPO_OWNER },
+  ]
+  : []
+
+fetch_api_data: try {
+  if (fetchedReposCreatedAndStarredByMe.length) break fetch_api_data;
+
   for await (const { name } of selfStarredReposOfUser(REPO_OWNER)) {
     console.log(`Found own starred repo: ${name}`);
 
@@ -75,11 +83,7 @@ try {
 
 
 const repoBadges = await renderMarkdownRepoBadges(
-  // fetchedReposCreatedAndStarredByMe
-  [
-    { name: "apache-superset-quick-init", owner: REPO_OWNER },
-    { name: "download-github-folder", owner: REPO_OWNER },
-  ]
+  fetchedReposCreatedAndStarredByMe
 );
 
 const newReadme = nonEditableTopPart
