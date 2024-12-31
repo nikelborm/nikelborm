@@ -48,11 +48,11 @@ export async function renderRepoToMarkdownBadge(
     .replaceAll('#444000', 'var(--button-star-iconColor)')
     .replaceAll('#202644', 'var(--borderColor-default,var(--color-border-default,#30363d))')
     .replaceAll('#202020', 'var(--bgColor-default, var(--color-canvas-default))')
-    .replaceAll(/\s+/mg, ' ');
+    // .replaceAll(/\s+/mg, ' ');
 
   console.log(repoPreviewSvgImageURL + '\n');
   console.log(text + '\n');
-  // await writeFile(`./images/${owner}_${name}.svg`, text);
+  await writeFile(`./images/${owner}_${name}.svg`, text);
 
   const repoURL = `https://github.com/${owner}/${name}`;
 
