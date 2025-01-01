@@ -1,5 +1,5 @@
 import { readFile } from 'node:fs/promises';
-import { IRepo, RepoZodSchema } from './repo.interface.js';
+import { RepoZodSchema } from './repo.interface.js';
 
 export async function getMockRepos(owner: string) {
   try {
