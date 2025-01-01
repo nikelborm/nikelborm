@@ -63,8 +63,8 @@ try {
       // If you don't like rescaling and repainting, you can change it here
       // pin: getOriginalDarkThemeMarkdownPin(repo),
       pinRefreshPromise: process.env['SKIP_REFRESHING_IMAGES_FOLDER'] === "true"
-        ? refreshScaledRepaintedPinInImagesFolder(repo)
-        : Promise.resolve(),
+        ? Promise.resolve()
+        : refreshScaledRepaintedPinInImagesFolder(repo),
     });
   }
 } catch (error) {
@@ -105,16 +105,17 @@ const maxStars = aggParam('max', 'star');
 const minStars = aggParam('min', 'star');
 const maxForks = aggParam('max', 'fork');
 const minForks = aggParam('min', 'fork');
+console.log({ maxStars, minStars, maxForks, minForks })
 
 const pinsToBeSortedWithCoefficients = fetchedReposWithPins.map(({ repo: r, pin }) => ({
-  pin,
+  pin: pin,
   templateCoefficient: +r.isTemplate,
   boilerplateCoefficient: +r.name.includes('boiler'),
   archiveCoefficient: +r.isItArchived,
   hackathonCoefficient: +r.name.includes('hackathon'),
   experimentCoefficient: +r.name.includes('experiment'),
   lastTimeBeenPushedIntoCoefficient: Number(r.lastTimeBeenPushedInto),
-  publicityCoefficient: (r.starCount - minStars) / (maxStars - minStars) + (r.forkCount - minForks) / (maxForks - minForks)
+  publicityCoefficient: (r.starCount - minStars) / (maxStars - minStars) + ((r.forkCount - minForks) / (maxForks - minForks)*0.25)
 }))
 
 
@@ -142,7 +143,7 @@ await Promise.all(fetchedReposWithPins.map(_ => _.pinRefreshPromise));
 
 const newReadme = nonEditableTopPart
   + renderMarkdownTableOfSmallStrings(
-    fetchedReposWithPins.map(_ => _.pin),
+    pinsToBeSortedWithCoefficients.map(_ => _.pin),
     AMOUNT_OF_COLUMNS
   )
   + nonEditableBottomPart;
