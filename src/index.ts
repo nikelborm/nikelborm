@@ -2,6 +2,7 @@ export * from './getEnvVarOrFail.js';
 export * from './getMockRepos.js';
 export * from './getPathToImageInRepo.js';
 export * from './getPinURLs.js';
+export * from './getPinsSortedByTheirProbablePopularity.js';
 export * from './markdownPinToAndFrom.js';
 export * from './parseLinkHeader.js';
 export * from './refreshScaledRepaintedPinInImagesFolder.js';
