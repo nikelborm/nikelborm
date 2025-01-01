@@ -9,3 +9,4 @@ export const RepoZodSchema = z.object({
 }).strict();
 
 export type IRepo = z.infer<typeof RepoZodSchema>;
+export type IMiniRepo = Pick<IRepo, 'owner' | 'name'>;

@@ -1,5 +1,10 @@
-export function renderMarkdownTableOfSmallStrings(smallStrings: string[], columnsAmount: number) {
-  if (smallStrings.some(s => s.includes("\n") || s.includes("\r")))
+export function renderMarkdownTableOfSmallStrings(
+  smallStrings: string[],
+  columnsAmount: number
+) {
+  if (smallStrings.some(
+    s => s.includes("\n") || s.includes("\r")
+  ))
     throw new Error(
       "Strings passed to markdown table renderer cannot have newlines"
     );
