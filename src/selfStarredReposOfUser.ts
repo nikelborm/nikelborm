@@ -8,7 +8,7 @@ export async function* selfStarredReposOfUser(username: string) {
 
   // The first way:
   // 1. get all starred repos of the user (/users/{username}/starred)
-  //    respecting pagination (N requests = A / 100)
+  //    respecting pagination (N requests = A / 100 on a page)
   // 2. 0 requests to check if it's user's own repo, because we can
   //    determine that from the responses above
 
@@ -24,7 +24,7 @@ export async function* selfStarredReposOfUser(username: string) {
   // K = B / 25 = 4 requests
   // Result = K + B = 104 requests
 
-  // So I chose the second way.
+  // So I chose the first way.
   for await (const repo of starredReposOfUser(username, 100)) {
     if (repo.owner === username) yield repo
   }
