@@ -43,7 +43,7 @@ const {
 
 let delayedError: Error | null = null;
 
-const repoPins: {
+const fetchedReposWithPins: {
   repo: IRepo,
   pin: string,
   pinRefreshPromise: Promise<void>,
@@ -57,7 +57,7 @@ try {
   for await (const repo of repos) {
     console.log(`Found own starred repo: ${repo.name}, ${repo.lastTimeBeenPushedInto}`);
 
-    repoPins.push({
+    fetchedReposWithPins.push({
       repo,
       pin: getScaledRepaintedMarkdownPin(repo),
       // If you don't like rescaling and repainting, you can change it here
@@ -69,7 +69,7 @@ try {
   }
 } catch (error) {
   const passesGracefulDegradationCondition = error instanceof RequestError
-    && repoPins.length > (
+    && fetchedReposWithPins.length > (
       extractReposFromMarkdown(oldEditablePart).length
         * FATAL_PERCENT_OF_REPOS_LOST_DUE_TO_API_ERRORS / 100
     );
@@ -95,41 +95,54 @@ try {
 if (process.env['MOCK_API'] !== 'true')
   await writeFile(
     './reposCreatedAndStarredByMe.json',
-    JSON.stringify(repoPins.map(_ => _.repo))
+    JSON.stringify(fetchedReposWithPins.map(_ => _.repo))
   );
 
-repoPins.sort((a, b) => {
-  type F = (r: IRepo) => number;
-  const smallestFirst = (f: F) => f(a.repo) - f(b.repo);
-  const biggestFirst = (f: F) => -smallestFirst(f);
+const aggParam = (agg: 'min' | 'max', param: 'star' | 'fork') =>
+  Math[agg](...fetchedReposWithPins.map(_ => _.repo[`${param}Count`]))
 
-  const templatesToTop = biggestFirst(r => +r.isTemplate);
-  if (templatesToTop) return templatesToTop;
+const maxStars = aggParam('max', 'star');
+const minStars = aggParam('min', 'star');
+const maxForks = aggParam('max', 'fork');
+const minForks = aggParam('min', 'fork');
 
-  const boilerplatesToTop = biggestFirst(r => +r.name.includes('boiler'));
-  if (boilerplatesToTop) return boilerplatesToTop;
+const pinsToBeSortedWithCoefficients = fetchedReposWithPins.map(({ repo: r, pin }) => ({
+  pin,
+  templateCoefficient: +r.isTemplate,
+  boilerplateCoefficient: +r.name.includes('boiler'),
+  archiveCoefficient: +r.isItArchived,
+  hackathonCoefficient: +r.name.includes('hackathon'),
+  experimentCoefficient: +r.name.includes('experiment'),
+  lastTimeBeenPushedIntoCoefficient: Number(r.lastTimeBeenPushedInto),
+  publicityCoefficient: (r.starCount - minStars) / (maxStars - minStars) + (r.forkCount - minForks) / (maxForks - minForks)
+}))
 
-  const archivedToBottom = smallestFirst(r => +r.isItArchived);
-  if (archivedToBottom) return archivedToBottom;
 
-  const hackathonsToBottom = smallestFirst(r => +r.name.includes('hackathon'));
-  if (hackathonsToBottom) return hackathonsToBottom;
+pinsToBeSortedWithCoefficients.sort((a, b) => {
+  type keys = keyof (typeof pinsToBeSortedWithCoefficients)[number];
+  // `extends infer K` needed to run type distribution
+  type coefficient = keys extends infer K ? K extends `${infer U}Coefficient` ? U : never : never;
+  const smallestFirst = (c: coefficient) => a[`${c}Coefficient`] - b[`${c}Coefficient`];
+  const biggestFirst = (c: coefficient) => -smallestFirst(c);
+  let _: any;
 
-  const experimentsToBottom = smallestFirst(r => +r.name.includes('experiment'));
-  if (experimentsToBottom) return experimentsToBottom;
-
+  if (_ =  biggestFirst('template'   )) return _;
+  if (_ =  biggestFirst('boilerplate')) return _;
+  if (_ = smallestFirst('archive'    )) return _;
+  if (_ = smallestFirst('hackathon'  )) return _;
+  if (_ = smallestFirst('experiment' )) return _;
+  if (_ =  biggestFirst('publicity'  )) return _;
   // if null goes to bottom
-  const recentlyPushedToTop = biggestFirst(r => Number(r.lastTimeBeenPushedInto));
-  if (recentlyPushedToTop) return recentlyPushedToTop;
+  if (_ =  biggestFirst('lastTimeBeenPushedInto')) return _;
 
   return 0;
 })
 
-await Promise.all(repoPins.map(_ => _.pinRefreshPromise));
+await Promise.all(fetchedReposWithPins.map(_ => _.pinRefreshPromise));
 
 const newReadme = nonEditableTopPart
   + renderMarkdownTableOfSmallStrings(
-    repoPins.map(_ => _.pin),
+    fetchedReposWithPins.map(_ => _.pin),
     AMOUNT_OF_COLUMNS
   )
   + nonEditableBottomPart;
