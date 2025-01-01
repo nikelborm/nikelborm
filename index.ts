@@ -12,7 +12,7 @@ import {
   IRepo,
   refreshScaledRepaintedPinInImagesFolder,
   renderMarkdownTableOfSmallStrings,
-  renderRepoToScaledRepaintedMarkdownPin,
+  getScaledRepaintedMarkdownPin,
   selfStarredReposOfUser,
   splitStringApart
 } from './src/index.js';
@@ -59,9 +59,9 @@ try {
 
     repoPins.push({
       repo,
-      pin: renderRepoToScaledRepaintedMarkdownPin(repo),
+      pin: getScaledRepaintedMarkdownPin(repo),
       // If you don't like rescaling and repainting, you can change it here
-      // pin: renderRepoToOriginalDarkThemePinURL(repo),
+      // pin: getOriginalDarkThemeMarkdownPin(repo),
       pinRefreshPromise: process.env['SKIP_REFRESHING_IMAGES_FOLDER'] === "true"
         ? refreshScaledRepaintedPinInImagesFolder(repo)
         : Promise.resolve(),

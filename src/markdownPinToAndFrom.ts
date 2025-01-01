@@ -3,7 +3,7 @@ import { z } from 'zod';
 import { themes } from './themes.js';
 import { getOriginalDarkThemePinURL, getScaledRepaintedRepoPinURL } from './getPinURLs.js';
 
-export function renderRepoToScaledRepaintedMarkdownPin(repo: IMiniRepo) {
+export function getScaledRepaintedMarkdownPin(repo: IMiniRepo) {
   return themes.map(theme => hidePinIfEnvSaysSo(
     theme,
     getMarkdownPin(
@@ -14,7 +14,7 @@ export function renderRepoToScaledRepaintedMarkdownPin(repo: IMiniRepo) {
   )).join('');
 }
 
-export function renderRepoToOriginalDarkThemePinURL(repo: IMiniRepo) {
+export function getOriginalDarkThemeMarkdownPin(repo: IMiniRepo) {
   return getMarkdownPin(
     repo.name,
     getOriginalDarkThemePinURL(repo),
