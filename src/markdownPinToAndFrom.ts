@@ -9,7 +9,7 @@ export function getScaledRepaintedMarkdownPin(repo: IMiniRepo) {
     getMarkdownPin(
       repo.name,
       getScaledRepaintedRepoPinURL(repo, theme),
-      `${getRepoURL(repo)}#gh-${theme}-mode-only)`,
+      `${getRepoURL(repo)}#gh-${theme}-mode-only`,
     )
   )).join('');
 }
