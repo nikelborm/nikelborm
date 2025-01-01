@@ -53,7 +53,7 @@ export async function* starredReposOfUser(username: string, per_page: number) {
         lastTimeBeenPushedInto: repo.pushed_at
           ? new Date(repo.pushed_at)
           : null,
-      }
+      } satisfies IRepo;
     }
 
     doAnotherStep = !!linkHeader.next?.url;
