@@ -99,24 +99,28 @@ if (process.env['MOCK_API'] !== 'true')
   );
 
 repoPins.sort((a, b) => {
-  const compare = (f: (r: IRepo) => number) => f(a.repo) - f(b.repo);
-  const templateToTop = -compare(r => +r.isTemplate);
-  if (templateToTop) return templateToTop;
+  type F = (r: IRepo) => number;
+  const smallestFirst = (f: F) => f(a.repo) - f(b.repo);
+  const biggestFirst = (f: F) => -smallestFirst(f);
 
-  const boilerplatesToTop = -compare(r => +r.name.includes('boiler'));
+  const templatesToTop = biggestFirst(r => +r.isTemplate);
+  if (templatesToTop) return templatesToTop;
+
+  const boilerplatesToTop = biggestFirst(r => +r.name.includes('boiler'));
   if (boilerplatesToTop) return boilerplatesToTop;
 
-  const archivedToBottom = compare(r => +r.isItArchived);
+  const archivedToBottom = smallestFirst(r => +r.isItArchived);
   if (archivedToBottom) return archivedToBottom;
 
-  const hackathonsToBottom = compare(r => +r.name.includes('hackathon'));
+  const hackathonsToBottom = smallestFirst(r => +r.name.includes('hackathon'));
   if (hackathonsToBottom) return hackathonsToBottom;
 
-  const experimentsToBottom = compare(r => +r.name.includes('experiment'));
+  const experimentsToBottom = smallestFirst(r => +r.name.includes('experiment'));
   if (experimentsToBottom) return experimentsToBottom;
 
-  const lastPushedToTop = -compare(r => Number(r.lastTimeBeenPushedInto));
-  if (lastPushedToTop) return lastPushedToTop; // null goes to bottom
+  // if null goes to bottom
+  const recentlyPushedToTop = biggestFirst(r => Number(r.lastTimeBeenPushedInto));
+  if (recentlyPushedToTop) return recentlyPushedToTop;
 
   return 0;
 })
