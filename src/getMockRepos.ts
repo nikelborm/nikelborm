@@ -1,5 +1,5 @@
 import { readFile } from 'node:fs/promises';
-import { RepoZodSchema } from './repo.interface.js';
+import { IRepo, RepoZodSchema } from './repo.interface.js';
 
 export async function getMockRepos(owner: string) {
   try {
@@ -14,8 +14,10 @@ export async function getMockRepos(owner: string) {
         name,
         isItArchived: false,
         isTemplate: false,
+        starCount: 1,
+        forkCount: 0,
         lastTimeBeenPushedInto: new Date(),
         owner
-      }))
+      }) satisfies IRepo)
   }
 }

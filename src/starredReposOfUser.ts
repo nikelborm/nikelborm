@@ -50,6 +50,8 @@ export async function* starredReposOfUser(username: string, per_page: number) {
         owner: repo.owner.login,
         isItArchived: repo.archived,
         isTemplate: !!repo.is_template,
+        starCount: repo.stargazers_count,
+        forkCount: repo.forks_count,
         lastTimeBeenPushedInto: repo.pushed_at
           ? new Date(repo.pushed_at)
           : null,
