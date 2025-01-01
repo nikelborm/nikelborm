@@ -42,8 +42,6 @@ const {
   endToken: END_TOKEN,
 });
 
-let delayedError: Error | null = null;
-
 const fetchedReposWithPins: {
   repo: IRepo,
   pin: string,
@@ -82,7 +80,7 @@ try {
       for graceful degradation was met. It means that before failing, API
       returned more than %s%% of the repos relative to previous CI run.
     `, README_FILE_PATH, FATAL_PERCENT_OF_REPOS_LOST_DUE_TO_API_ERRORS);
-    delayedError = error;
+    console.error(error);
   } else throw new Error(
     format(outdent`
       There was an error during fetching data from Github API and condition
@@ -94,7 +92,7 @@ try {
 }
 
 if (process.env['MOCK_API'] !== 'true')
-  await writeFile(
+  await writeFile( // saving it for later use to publish as Actions artifact
     './reposCreatedAndStarredByMe.json',
     JSON.stringify(fetchedReposWithPins.map(_ => _.repo))
   );
@@ -111,5 +109,3 @@ const newReadme = nonEditableTopPart
 await writeFile(README_FILE_PATH, newReadme);
 
 console.log(`Finished writing result to ${README_FILE_PATH} file`);
-
-if (delayedError) throw delayedError;
