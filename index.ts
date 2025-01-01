@@ -107,16 +107,30 @@ const maxForks = aggParam('max', 'fork');
 const minForks = aggParam('min', 'fork');
 console.log({ maxStars, minStars, maxForks, minForks })
 
-const pinsToBeSortedWithCoefficients = fetchedReposWithPins.map(({ repo: r, pin }) => ({
-  pin: pin,
-  templateCoefficient: +r.isTemplate,
-  boilerplateCoefficient: +r.name.includes('boiler'),
-  archiveCoefficient: +r.isItArchived,
-  hackathonCoefficient: +r.name.includes('hackathon'),
-  experimentCoefficient: +r.name.includes('experiment'),
-  lastTimeBeenPushedIntoCoefficient: Number(r.lastTimeBeenPushedInto),
-  publicityCoefficient: (r.starCount - minStars) / (maxStars - minStars) + ((r.forkCount - minForks) / (maxForks - minForks)*0.25)
-}))
+const pinsToBeSortedWithCoefficients = fetchedReposWithPins.map(({ repo: r, pin }) => {
+  const normalizedStarsCoefficient = (r.starCount - minStars) / (maxStars - minStars);
+  const normalizedForksCoefficientWithAdjustedValue = (r.forkCount - minForks) / (maxForks - minForks) * 0.25;
+  const publicityCoefficient = normalizedStarsCoefficient
+    + normalizedForksCoefficientWithAdjustedValue;
+  // publicityCoefficient: min=0, max=1.25
+  // Five popularity classes
+  // 0 ... 0.25, 0.25 ... 0.5, 0.5 ... 0.75, 0.75 ... 0.1, 1 ... 1.25;
+  return {
+    pin: pin,
+    templateCoefficient: +r.isTemplate,
+    boilerplateCoefficient: +r.name.includes('boiler'),
+    archiveCoefficient: +r.isItArchived,
+    hackathonCoefficient: +r.name.includes('hackathon'),
+    experimentCoefficient: +r.name.includes('experiment'),
+    lastTimeBeenPushedIntoCoefficient: Number(r.lastTimeBeenPushedInto),
+    publicityClassCoefficient:
+        publicityCoefficient > 1  ? 5 :
+      publicityCoefficient > 0.75 ? 4 :
+      publicityCoefficient > 0.5  ? 3 :
+      publicityCoefficient > 0.25 ? 2 :
+      1
+  }
+})
 
 
 pinsToBeSortedWithCoefficients.sort((a, b) => {
@@ -127,14 +141,13 @@ pinsToBeSortedWithCoefficients.sort((a, b) => {
   const biggestFirst = (c: coefficient) => -smallestFirst(c);
   let _: any;
 
-  if (_ =  biggestFirst('template'   )) return _;
-  if (_ =  biggestFirst('boilerplate')) return _;
-  if (_ = smallestFirst('archive'    )) return _;
-  if (_ = smallestFirst('hackathon'  )) return _;
-  if (_ = smallestFirst('experiment' )) return _;
-  if (_ =  biggestFirst('publicity'  )) return _;
-  // if null goes to bottom
-  if (_ =  biggestFirst('lastTimeBeenPushedInto')) return _;
+  if (_ =  biggestFirst('template'              )) return _;
+  if (_ =  biggestFirst('boilerplate'           )) return _;
+  if (_ = smallestFirst('archive'               )) return _;
+  if (_ = smallestFirst('hackathon'             )) return _;
+  if (_ = smallestFirst('experiment'            )) return _;
+  if (_ =  biggestFirst('publicityClass'        )) return _;
+  if (_ =  biggestFirst('lastTimeBeenPushedInto')) return _; // if null goes to bottom
 
   return 0;
 })
