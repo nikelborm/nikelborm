@@ -6,56 +6,58 @@ import { outdent } from 'outdent';
 
 type SmallRepo = Pick<IRepo, 'owner' | 'name'>;
 
-export async function renderRepoToMarkdownPin({ owner, name }: SmallRepo) {
-  if (process.env['SKIP_REFRESHING_IMAGES_FOLDER'] !== "true")
-    await refreshPinInImagesFolder({ owner, name });
+const themes = ['dark', 'light'] as const;
+type Theme = typeof themes[number];
 
-  // return `[![${name} repo](${sourceRepoPinURL})](${repoURL})`;
-  // return `<a href="${repoURL}">${text}</a>`
-  return ['dark', 'light'].map(theme =>
-    hidePinIfEnvSaysSo(theme, `[![${
-      name
-    } repo](https://raw.githubusercontent.com/${owner}/${
-      owner
-    }/refs/heads/main/images/${owner}_${name}_${
-      theme
-    }_theme.svg)](https://github.com/${owner}/${name}#gh-${
-      theme
-    }-mode-only)`)
-  ).join('');
+export function renderRepoToScaledRepaintedMarkdownPin(repo: SmallRepo) {
+  return themes.map(theme => hidePinIfEnvSaysSo(
+    theme,
+    getMarkdownPin(
+      repo.name,
+      getScaledRepaintedRepoPinURL(repo, theme),
+      `${getRepoURL(repo)}#gh-${theme}-mode-only)`,
+    )
+  )).join('');
 }
 
-async function refreshPinInImagesFolder({ owner, name }: SmallRepo) {
+export function renderRepoToOriginalDarkThemePinURL(repo: SmallRepo) {
+  return getMarkdownPin(
+    repo.name,
+    getOriginalDarkThemePinURL(repo),
+    getRepoURL(repo),
+  );
+}
+
+export async function refreshScaledRepaintedPinInImagesFolder({ owner, name }: SmallRepo) {
   const {
-    originalRepoPinSVG,
-    originalRepoPinURL
-  } = await fetchOriginalRepoPin({ owner, name });
+    originalDarkThemePinSVG,
+    originalDarkThemePinURL
+  } = await fetchOriginalDarkThemePin({ owner, name });
   console.log(`Fetched original repo pin { owner:"${owner}", name:"${name}" }`);
 
-  const {
-    repoPinDarkThemeSVG,
-    repoPinLightThemeSVG
-  } = getScaledRepaintedRepoPins(originalRepoPinSVG);
+  const scaledRepaintedPinSVGs = getScaledRepaintedRepoPins(originalDarkThemePinSVG);
 
-  const repoPinDarkThemeFilePath = `images/${owner}_${name}_dark_theme.svg`;
-  const repoPinLightThemeFilePath = `images/${owner}_${name}_light_theme.svg`;
-
-  await Promise.all([
-    writeFile(repoPinDarkThemeFilePath,  repoPinDarkThemeSVG),
-    writeFile(repoPinLightThemeFilePath, repoPinLightThemeSVG),
-  ]);
+  const writtenPaths = await Promise.all(
+    themes.map(async (theme) => {
+      const filePath = getPathToImageInRepo({ owner, name }, theme);
+      await writeFile(
+        filePath,
+        scaledRepaintedPinSVGs[`${theme}ThemePinSVG`]
+      );
+      return filePath;
+    })
+  );
 
   console.log(outdent`
-    Written files:
-    1. ${repoPinDarkThemeFilePath}
-    2. ${repoPinLightThemeFilePath}
-    Those files are transformed versions of ${originalRepoPinURL}\n
+Written files:
+${writtenPaths.map(v => '- ' + v).join('\n')}
+Those files are transformed versions of ${originalDarkThemePinURL}\n
   `);
 }
 
 
-function getScaledRepaintedRepoPins(originalRepoPinSVG: string) {
-  const repoPinDarkThemeSVG = originalRepoPinSVG
+function getScaledRepaintedRepoPins(originalDarkThemePinSVG: string) {
+  const darkThemePinSVG = originalDarkThemePinSVG
     // .replaceAll('#008088', /* title_color  */ 'var(--fgColor-default, var(--color-fg-default))')
     // .replaceAll('#880800', /* text_color   */ 'var(--fgColor-default, var(--color-fg-default))')
     // .replaceAll('#444000', /* icon_color   */ 'var(--button-star-iconColor)')
@@ -69,22 +71,52 @@ function getScaledRepaintedRepoPins(originalRepoPinSVG: string) {
     .replaceAll('viewBox="0 0 400 120"', 'viewBox="24 27 385 70"')
     .replaceAll(/\s+/mg, ' ');
 
-  const repoPinLightThemeSVG = repoPinDarkThemeSVG
+  const lightThemePinSVG = darkThemePinSVG
     .replaceAll('#f0f6fc', '#1f2328');
 
+  return { darkThemePinSVG, lightThemePinSVG };
+}
+
+async function fetchOriginalDarkThemePin(repo: SmallRepo) {
+  const originalDarkThemePinURL = getOriginalDarkThemePinURL(repo);
+
+  console.log(`Started fetching repo pin ` + JSON.stringify(repo));
+  const { statusCode, body } = await request(originalDarkThemePinURL)
+
+  if (statusCode !== 200) throw new Error(
+    `statusCode=${statusCode}: Failed to fetch repo pin image for ${originalDarkThemePinURL}`
+  );
+
   return {
-    repoPinDarkThemeSVG,
-    repoPinLightThemeSVG
+    originalDarkThemePinURL,
+    originalDarkThemePinSVG: await body.text()
   };
 }
 
-async function fetchOriginalRepoPin({ owner, name }: SmallRepo) {
-  const originalRepoPinURL = new URL(
+function getMarkdownPin(name: string, pinURL: string, repoURL: string) {
+  return `[![${name} repo](${pinURL})](${repoURL})`;
+}
+
+function getRepoURL({ owner, name }: SmallRepo) {
+  return `https://github.com/${owner}/${name}/`;
+}
+
+function getScaledRepaintedRepoPinURL({ owner, name }: SmallRepo, theme: Theme) {
+  return `https://raw.githubusercontent.com/${owner}/${owner}/refs/heads/main/`
+    + getPathToImageInRepo({ owner, name }, theme);
+}
+
+function getPathToImageInRepo({ owner, name }: SmallRepo, theme: Theme) {
+  return `images/${owner}_${name}_${theme}_theme.svg`;
+}
+
+function getOriginalDarkThemePinURL({ owner, name }: SmallRepo) {
+  const originalDarkThemePinURL = new URL(
     'api/pin',
     'https://github-readme-stats.vercel.app',
   );
 
-  originalRepoPinURL.search = '?' + new URLSearchParams({
+  originalDarkThemePinURL.search = '?' + new URLSearchParams({
     username: owner,
     repo: name,
     // theme: 'vision-friendly-dark', // https://github.com/anuraghazra/github-readme-stats/blob/master/themes/README.md
@@ -111,17 +143,7 @@ async function fetchOriginalRepoPin({ owner, name }: SmallRepo) {
     hide_border: 'true',
   });
 
-  console.log(`Started fetching repo pin { owner:"${owner}", name:"${name}" }`);
-  const { statusCode, body } = await request(originalRepoPinURL)
-
-  if (statusCode !== 200) throw new Error(
-    `statusCode=${statusCode}: Failed to fetch repo pin image for ${originalRepoPinURL}`
-  );
-
-  return {
-    originalRepoPinURL,
-    originalRepoPinSVG: await body.text()
-  };
+  return '' + originalDarkThemePinURL;
 }
 
 const MarkdownRepoPinZodSchema = z.object({

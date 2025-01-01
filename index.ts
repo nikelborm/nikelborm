@@ -10,8 +10,9 @@ import {
   getEnvVarOrFail,
   getMockRepos,
   IRepo,
+  refreshScaledRepaintedPinInImagesFolder,
   renderMarkdownTableOfSmallStrings,
-  renderRepoToMarkdownPin,
+  renderRepoToScaledRepaintedMarkdownPin,
   selfStarredReposOfUser,
   splitStringApart
 } from './src/index.js';
@@ -42,9 +43,10 @@ const {
 
 let delayedError: Error | null = null;
 
-const futureRepoPins: {
+const repoPins: {
   repo: IRepo,
-  pin: Promise<string>,
+  pin: string,
+  pinRefreshPromise: Promise<void>,
 }[] = [];
 
 try {
@@ -55,14 +57,19 @@ try {
   for await (const repo of repos) {
     console.log(`Found own starred repo: ${repo.name}, ${repo.lastTimeBeenPushedInto}`);
 
-    futureRepoPins.push({
+    repoPins.push({
       repo,
-      pin: renderRepoToMarkdownPin(repo)
+      pin: renderRepoToScaledRepaintedMarkdownPin(repo),
+      // If you don't like rescaling and repainting, you can change it here
+      // pin: renderRepoToOriginalDarkThemePinURL(repo),
+      pinRefreshPromise: process.env['SKIP_REFRESHING_IMAGES_FOLDER'] === "true"
+        ? refreshScaledRepaintedPinInImagesFolder(repo)
+        : Promise.resolve(),
     });
   }
 } catch (error) {
   const passesGracefulDegradationCondition = error instanceof RequestError
-    && futureRepoPins.length > (
+    && repoPins.length > (
       extractReposFromMarkdown(oldEditablePart).length
         * FATAL_PERCENT_OF_REPOS_LOST_DUE_TO_API_ERRORS / 100
     );
@@ -88,10 +95,10 @@ try {
 if (process.env['MOCK_API'] !== 'true')
   await writeFile(
     './reposCreatedAndStarredByMe.json',
-    JSON.stringify(futureRepoPins.map(_ => _.repo))
+    JSON.stringify(repoPins.map(_ => _.repo))
   );
 
-futureRepoPins.sort((a, b) => {
+repoPins.sort((a, b) => {
   const compare = (f: (r: IRepo) => number) => f(a.repo) - f(b.repo);
   const templateToTop = -compare(r => +r.isTemplate);
   if (templateToTop) return templateToTop;
@@ -114,13 +121,11 @@ futureRepoPins.sort((a, b) => {
   return 0;
 })
 
-const repoPins = await Promise.all(
-  futureRepoPins.map(_ => _.pin)
-);
+await Promise.all(repoPins.map(_ => _.pinRefreshPromise));
 
 const newReadme = nonEditableTopPart
   + renderMarkdownTableOfSmallStrings(
-    repoPins,
+    repoPins.map(_ => _.pin),
     AMOUNT_OF_COLUMNS
   )
   + nonEditableBottomPart;
