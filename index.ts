@@ -107,58 +107,54 @@ const maxForks = aggParam('max', 'fork');
 const minForks = aggParam('min', 'fork');
 console.log({ maxStars, minStars, maxForks, minForks })
 
-const pinsToBeSortedWithCoefficients = fetchedReposWithPins.map(({ repo: r, pin }) => {
-  const normalizedStarsCoefficient = (r.starCount - minStars) / (maxStars - minStars);
-  const normalizedForksCoefficientWithAdjustedValue = (r.forkCount - minForks) / (maxForks - minForks) * 0.25;
-  const publicityCoefficient = normalizedStarsCoefficient
-    + normalizedForksCoefficientWithAdjustedValue;
-  // publicityCoefficient: min=0, max=1.25
-  // Five popularity classes
-  // 0 ... 0.25, 0.25 ... 0.5, 0.5 ... 0.75, 0.75 ... 0.1, 1 ... 1.25;
-  return {
-    pin: pin,
-    templateCoefficient: +r.isTemplate,
-    boilerplateCoefficient: +r.name.includes('boiler'),
-    archiveCoefficient: +r.isItArchived,
-    hackathonCoefficient: +r.name.includes('hackathon'),
-    experimentCoefficient: +r.name.includes('experiment'),
-    lastTimeBeenPushedIntoCoefficient: Number(r.lastTimeBeenPushedInto),
-    publicityClassCoefficient:
-        publicityCoefficient > 1  ? 5 :
-      publicityCoefficient > 0.75 ? 4 :
-      publicityCoefficient > 0.5  ? 3 :
-      publicityCoefficient > 0.25 ? 2 :
-      1
-  }
-})
+const sortedPins = fetchedReposWithPins
+  .map(({ repo: r, pin }) => {
+    const normalizedStarsCoefficient = (r.starCount - minStars) / (maxStars - minStars);
+    const normalizedForksCoefficientWithAdjustedValue = (r.forkCount - minForks) / (maxForks - minForks) * 0.25;
+    const publicityCoefficient = normalizedStarsCoefficient
+      + normalizedForksCoefficientWithAdjustedValue;
+    // publicityCoefficient: min=0, max=1.25
+    // Five popularity classes
+    // 0 ... 0.25, 0.25 ... 0.5, 0.5 ... 0.75, 0.75 ... 0.1, 1 ... 1.25;
+    return {
+      pin: pin,
+      templateCoefficient: +r.isTemplate,
+      boilerplateCoefficient: +r.name.includes('boiler'),
+      archiveCoefficient: +r.isItArchived,
+      hackathonCoefficient: +r.name.includes('hackathon'),
+      experimentCoefficient: +r.name.includes('experiment'),
+      lastTimeBeenPushedIntoCoefficient: Number(r.lastTimeBeenPushedInto),
+      publicityClassCoefficient:
+          publicityCoefficient > 1  ? 5 :
+        publicityCoefficient > 0.75 ? 4 :
+        publicityCoefficient > 0.5  ? 3 :
+        publicityCoefficient > 0.25 ? 2 :
+        1
+    }
+  })
+  .sort((a, b) => {
+    // `extends infer K` needed to run type distribution
+    type coefficient = keyof typeof a extends infer K ? K extends `${infer U}Coefficient` ? U : never : never;
+    const smallestFirst = (c: coefficient) => a[`${c}Coefficient`] - b[`${c}Coefficient`];
+    const biggestFirst = (c: coefficient) => -smallestFirst(c);
+    let _: any;
 
+    if (_ =  biggestFirst('template'              )) return _;
+    if (_ =  biggestFirst('boilerplate'           )) return _;
+    if (_ = smallestFirst('archive'               )) return _;
+    if (_ = smallestFirst('hackathon'             )) return _;
+    if (_ = smallestFirst('experiment'            )) return _;
+    if (_ =  biggestFirst('publicityClass'        )) return _;
+    if (_ =  biggestFirst('lastTimeBeenPushedInto')) return _; // if null goes to bottom
 
-pinsToBeSortedWithCoefficients.sort((a, b) => {
-  type keys = keyof (typeof pinsToBeSortedWithCoefficients)[number];
-  // `extends infer K` needed to run type distribution
-  type coefficient = keys extends infer K ? K extends `${infer U}Coefficient` ? U : never : never;
-  const smallestFirst = (c: coefficient) => a[`${c}Coefficient`] - b[`${c}Coefficient`];
-  const biggestFirst = (c: coefficient) => -smallestFirst(c);
-  let _: any;
-
-  if (_ =  biggestFirst('template'              )) return _;
-  if (_ =  biggestFirst('boilerplate'           )) return _;
-  if (_ = smallestFirst('archive'               )) return _;
-  if (_ = smallestFirst('hackathon'             )) return _;
-  if (_ = smallestFirst('experiment'            )) return _;
-  if (_ =  biggestFirst('publicityClass'        )) return _;
-  if (_ =  biggestFirst('lastTimeBeenPushedInto')) return _; // if null goes to bottom
-
-  return 0;
-})
+    return 0;
+  })
+  .map(_ => _.pin)
 
 await Promise.all(fetchedReposWithPins.map(_ => _.pinRefreshPromise));
 
 const newReadme = nonEditableTopPart
-  + renderMarkdownTableOfSmallStrings(
-    pinsToBeSortedWithCoefficients.map(_ => _.pin),
-    AMOUNT_OF_COLUMNS
-  )
+  + renderMarkdownTableOfSmallStrings(sortedPins, AMOUNT_OF_COLUMNS)
   + nonEditableBottomPart;
 
 await writeFile(README_FILE_PATH, newReadme);
