@@ -45,7 +45,6 @@ let delayedError: Error | null = null;
 const futureRepoPins: {
   repo: IRepo,
   pin: Promise<string>,
-  lastUpdateIndex: number
 }[] = [];
 
 try {
@@ -53,17 +52,13 @@ try {
     ? await getMockRepos(REPO_OWNER)
     : selfStarredReposOfUser(REPO_OWNER);
 
-  let lastUpdateIndex = 0;
   for await (const repo of repos) {
     console.log(`Found own starred repo: ${repo.name}, ${repo.lastTimeBeenPushedInto}`);
 
     futureRepoPins.push({
       repo,
-      lastUpdateIndex,
       pin: renderRepoToMarkdownPin(repo)
     });
-
-    lastUpdateIndex += 1;
   }
 } catch (error) {
   const passesGracefulDegradationCondition = error instanceof RequestError
@@ -97,7 +92,7 @@ if (process.env['MOCK_API'] !== 'true')
   );
 
 futureRepoPins.sort((a, b) => {
-  const compare = (c: (r: IRepo) => number) => c(a.repo) - c(b.repo);
+  const compare = (f: (r: IRepo) => number) => f(a.repo) - f(b.repo);
   const templateToTop = -compare(r => +r.isTemplate);
   if (templateToTop) return templateToTop;
 
@@ -113,14 +108,8 @@ futureRepoPins.sort((a, b) => {
   const experimentsToBottom = compare(r => +r.name.includes('experiment'));
   if (experimentsToBottom) return experimentsToBottom;
 
-
-  // If you want manually sort them, you can do it, but that's unnecessary
-  // because they already come pre-ordered using lastUpdateIndex
-  // const lastPushedToTop = -(+(a.repo.lastTimeBeenPushedInto ?? 0) - +(b.repo.lastTimeBeenPushedInto ?? 0));
-  // if (lastPushedToTop) return lastPushedToTop; // null goes to bottom
-
-  const lastUpdatedToTop = (a.lastUpdateIndex - b.lastUpdateIndex);
-  if (lastUpdatedToTop) return lastUpdatedToTop;
+  const lastPushedToTop = -compare(r => Number(r.lastTimeBeenPushedInto));
+  if (lastPushedToTop) return lastPushedToTop; // null goes to bottom
 
   return 0;
 })
