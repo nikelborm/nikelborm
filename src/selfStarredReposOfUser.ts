@@ -29,3 +29,47 @@ export async function* selfStarredReposOfUser(username: string) {
     if (repo.owner === username) yield repo
   }
 }
+
+// TODO: Rewrite to use graphql instead of rest when auth token is available
+
+
+// query GetSelfStarredRepos($username: String!) {
+//   user(login: $username) {
+//     repositories(first: 100) {
+//       nodes {
+//         name
+//         viewerHasStarred
+//         stargazers {
+//           nodes {
+//             login
+//           }
+//         }
+//       }
+//     }
+//   }
+// }
+
+// This is a perfect query
+// query GetSelfStarredRepos($username: String!) {
+//   user(login: $username) {
+//     starredRepositories(first: 100, ownedByViewer: true) {
+//       pageInfo {
+//         endCursor
+//         hasNextPage
+//         hasPreviousPage
+//         startCursor
+//       }
+//       totalCount
+//       isOverLimit
+//       nodes {
+//         name
+//         stargazerCount
+//         forkCount
+//         isArchived
+//         isTemplate
+//         isPrivate
+//         pushedAt
+//       }
+//     }
+//   }
+// }
