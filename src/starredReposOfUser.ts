@@ -1,5 +1,5 @@
 import { Octokit } from '@octokit/core';
-import { parseLinkHeader } from './parseLinkHeader.js';
+import { ILinkHeader, parseLinkHeader } from './parseLinkHeader.js';
 import { IRepo } from './repo.interface.js';
 
 // Self imposed restriction to exit infinite loops
@@ -35,13 +35,17 @@ export async function* starredReposOfUser(username: string, per_page: number) {
       },
     });
 
-    process.stdout.write(`Fetched ${sentAmountOfRequests}`);
+    let linkHeader: ILinkHeader;
 
-    const linkHeader = parseLinkHeader(response.headers.link);
+    try {
+      linkHeader = parseLinkHeader(response.headers.link);
 
-    const lastPage = linkHeader.last?.page;
+      const lastPage = linkHeader.last?.page;
 
-    console.log( lastPage ? ` out of ${lastPage} pages` : ` pages`);
+      console.log( `Fetched ${sentAmountOfRequests} out of ${lastPage ?? sentAmountOfRequests} pages`);
+    } catch (error) {
+      throw new Error(`Failed to parse link header fetched from ${sentAmountOfRequests} page`, { cause: error });
+    }
 
     for (const elem of response.data) {
       const repo = 'repo' in elem ? elem.repo : elem;
