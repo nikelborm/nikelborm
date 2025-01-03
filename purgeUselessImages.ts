@@ -30,6 +30,8 @@ const presentImageFileNames = new Set(
 
 const removalTargets = presentImageFileNames.difference(expectedToHaveImageFileNames);
 
+process.chdir('./images');
+
 await rimraf([...removalTargets]);
 
 console.log(
