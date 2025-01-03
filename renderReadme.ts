@@ -6,27 +6,27 @@ import { readFile, writeFile } from 'node:fs/promises';
 import { format } from 'node:util';
 import { outdent } from 'outdent';
 import {
-  extractReposFromMarkdown,
+  AMOUNT_OF_COLUMNS,
+  END_TOKEN,
+  FATAL_PERCENT_OF_REPOS_LOST_DUE_TO_API_ERRORS,
+  README_FILE_PATH,
+  START_TOKEN,
+} from './constants.js';
+import {
+  extractReposFromMarkdownStrict,
   getEnvVarOrFail,
   getMockRepos,
+  getPinsSortedByTheirProbablePopularity,
+  getScaledRepaintedMarkdownPin,
   IRepo,
   refreshScaledRepaintedPinInImagesFolder,
   renderMarkdownTableOfSmallStrings,
-  getScaledRepaintedMarkdownPin,
   selfStarredReposOfUser,
-  splitStringApart,
-  getPinsSortedByTheirProbablePopularity
+  splitStringApart
 } from './src/index.js';
 
-
-const START_TOKEN = '<!-- REPO-TABLE-INJECT-START -->';
-const END_TOKEN = '<!-- REPO-TABLE-INJECT-END -->';
-const README_FILE_PATH = 'README.md';
 // this is also a default environment variable provided by Github Action
-const REPO_OWNER = getEnvVarOrFail('GITHUB_REPOSITORY_OWNER');
-const AMOUNT_OF_COLUMNS = 2;
-// I'm okay with loosing less than 20% of pins due to reaching rate limits
-const FATAL_PERCENT_OF_REPOS_LOST_DUE_TO_API_ERRORS = 80;
+export const REPO_OWNER = getEnvVarOrFail('GITHUB_REPOSITORY_OWNER');
 
 const oldReadme = await readFile(README_FILE_PATH, 'utf8');
 
@@ -69,7 +69,7 @@ try {
 } catch (error) {
   const passesGracefulDegradationCondition = error instanceof RequestError
     && fetchedReposWithPins.length > (
-      extractReposFromMarkdown(oldEditablePart).length
+      extractReposFromMarkdownStrict(oldEditablePart).length
         * FATAL_PERCENT_OF_REPOS_LOST_DUE_TO_API_ERRORS / 100
     );
 

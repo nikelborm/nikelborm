@@ -47,5 +47,10 @@
         "name": "typescript-strict-plugin",
       }
     ]
-  }
+  },
+  "include": [
+    "./purgeUselessImages.ts",
+    "./renderReadme.ts",
+    "./src/index.ts"
+  ]
 }
