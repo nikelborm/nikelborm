@@ -31,10 +31,22 @@ export async function* racinglyIterateAll<
       for (const key of map.keys()) {
         map.delete(key);
       };
-      throw racer.error;
+      throw new RacingIterationError(racer.index, racer.error);
     } else {
       map.delete(racer.index);
-      yield racer.result;
+      yield {
+        index: racer.index,
+        result: racer.result,
+      };
     }
+  }
+}
+
+export class RacingIterationError extends Error {
+  constructor(
+    public readonly promiseIndex: number,
+    public override readonly cause: unknown
+  ) {
+    super("One of the racing promises failed");
   }
 }
