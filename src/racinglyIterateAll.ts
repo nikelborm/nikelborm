@@ -1,6 +1,6 @@
 export async function* racinglyIterateAll<
   U extends Array<Promise<unknown>> | [Promise<unknown>]
->(promises: U) {
+>(promises: U, failLate?: boolean) {
   let map = new Map(
     promises.map(
       (promise, index) => [
@@ -24,14 +24,24 @@ export async function* racinglyIterateAll<
     )
   );
 
+  const errors: RacingIterationError[] = [];
+
   while (map.size > 0) {
     const racer = await Promise.race(map.values());
 
     if (racer.status === 'error') {
-      for (const key of map.keys()) {
-        map.delete(key);
-      };
-      throw new RacingIterationError(racer.index, racer.error);
+      const racingIterationError = new RacingIterationError(
+        racer.index,
+        racer.error
+      );
+      if (failLate) {
+        errors.push(racingIterationError);
+      } else {
+        for (const key of map.keys()) {
+          map.delete(key);
+        };
+        throw racingIterationError;
+      }
     } else {
       map.delete(racer.index);
       yield {
@@ -39,6 +49,15 @@ export async function* racinglyIterateAll<
         result: racer.result,
       };
     }
+  }
+
+  if (errors.length === 1) throw errors[0];
+  if (errors.length > 1) throw new RacingIterationAggregateError(errors);
+}
+
+class RacingIterationAggregateError extends Error {
+  constructor(public readonly errors?: RacingIterationError[]) {
+    super("Few of the racing promises failed");
   }
 }
 

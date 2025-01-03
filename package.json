@@ -6,8 +6,9 @@
   "main": "dist/src/index.js",
   "license": "MIT",
   "scripts": {
-    "build": "tsc && chmod +x ./dist/renderReadme.js",
+    "build": "tsc && chmod +x ./dist/renderReadme.js ./dist/purgeUselessImages.js",
     "start": "tsx watch --env-file=.env --clear-screen ./renderReadme.ts",
+    "purge": "tsx ./purgeUselessImages.ts",
     "once": "tsx --env-file=.env ./renderReadme.ts"
   },
   "dependencies": {
