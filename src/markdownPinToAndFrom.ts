@@ -61,7 +61,7 @@ function parsePathToImageInsideRepo(pathToImageInsideRepo: string) {
 
   const match = path
     .basename(pathToImageInsideRepo)
-    .match(/^(?<username>[^_]+)_(?<repoName>[^_]+)_(?<themeName>[^_]+)_theme\.svg$/)
+    .match(/^(?<username>[^,]+),(?<repoName>[^,]+),(?<themeName>[^,]+)_theme\.svg$/)
 
   const result = imageFileNameElements.safeParse(match?.groups);
 
@@ -92,7 +92,7 @@ const MarkdownRepoPinZodSchema = z.object({
   repoURL: z.string().min(22).url().transform(val => new URL(val))
 }).strict();
 
-const markdownPinRegex = /\[!\[(?<repoName>[^[\]()]+) repo\]\((?<repoPinURL>https?:\/\/(github-readme-stats\.vercel\.app\/api\/pin|raw\.githubusercontent\.com)[^[\]()]+)\)\]\((?<repoURL>[^[\]()]+)\)/g;
+const markdownPinRegex = /\[!\[(?<repoNameFromPinImageAltText>[^[\]()]+) repo\]\((?<repoPinImageURL>https?:\/\/(github-readme-stats\.vercel\.app\/api\/pin|raw\.githubusercontent\.com)[^[\]()]+)\)\]\((?<repoURL>[^[\]()]+)\)/g;
 
 function parseMarkdownPinRegexMatchGroup(
   markdownRegexPinMatchGroup?: Record<string, string>
@@ -118,6 +118,7 @@ function parseMarkdownPinRegexMatchGroup(
     `);
 
     usernameFromPinURL = repoPinImageURL.searchParams.get("username");
+
     if (!usernameFromPinURL) throw new Error(outdent`
       pinURL that looks like github-readme-stats link doesn\'t have
       "username" query param
@@ -127,7 +128,10 @@ function parseMarkdownPinRegexMatchGroup(
       imageHost: repoPinImageURL.host
     };
   } else if (repoPinImageURL.host === 'raw.githubusercontent.com' as const) {
-    const [ owner, sameOwner, ...rest ] = repoPinImageURL.pathname.split('/')
+    const [ owner, sameOwner, ...rest ] = repoPinImageURL.pathname
+      .split('/')
+      .filter(Boolean);
+
     if (!owner) throw new Error(outdent`
       The first path element of what appears to be the GitHub CDN link
       isn't present. It should represent owner's login, but it's empty.
@@ -144,6 +148,7 @@ function parseMarkdownPinRegexMatchGroup(
       link supposed to point at GitHub profile's Readme, which should
       have been in repo with the same name as owner's login.
     `);
+
     usernameFromPinURL = owner;
 
     const {
@@ -153,12 +158,14 @@ function parseMarkdownPinRegexMatchGroup(
     } = parsePathToImageInsideRepo(
       path.join(...rest.slice(3))
     );
+
     if (usernameFromPinURL !== usernameFromImageFileName)
       throw new Error(outdent`
         The first part of image name is not equal to any of the first 2
         path elements of what appears to be the GitHub CDN link. It
         should be, because it should point to the same owner.
       `);
+
     repoNameFromPinURL = repoNameFromImageFileName;
 
     additionalContext = {
@@ -182,7 +189,7 @@ function parseMarkdownPinRegexMatchGroup(
   const [
     usernameFromRepoURL,
     repoNameFromRepoURL,
-  ] = repoURL.pathname.split('/');
+  ] = repoURL.pathname.split('/').filter(Boolean);
 
   if (!usernameFromRepoURL) throw new Error(
     `Repo URL doesn't have username in it`
