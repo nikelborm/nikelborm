@@ -9,6 +9,8 @@ export const LinkHeaderZodSchema = z.object( {
   ...getLinkFieldShapeObject('first')
 })
 
+export type ILinkHeader = z.infer<typeof LinkHeaderZodSchema>;
+
 export function parseLinkHeader(linkHeader: string | undefined | null) {
   try {
     return LinkHeaderZodSchema.parse(
