@@ -3,12 +3,12 @@
   "version": "0.1.0",
   "description": "My personal page",
   "type": "module",
-  "main": "dist/index.js",
+  "main": "dist/src/index.js",
   "license": "MIT",
   "scripts": {
-    "build": "tsc && chmod +x ./dist/index.js",
-    "start": "tsx watch --env-file=.env --clear-screen ./index.ts",
-    "once": "tsx --env-file=.env ./index.ts"
+    "build": "tsc && chmod +x ./dist/renderReadme.js",
+    "start": "tsx watch --env-file=.env --clear-screen ./renderReadme.ts",
+    "once": "tsx --env-file=.env ./renderReadme.ts"
   },
   "dependencies": {
     "@octokit/core": "^6.1.2",

@@ -30,7 +30,7 @@ export async function* selfStarredReposOfUser(username: string) {
   }
 }
 
-// TODO: Rewrite to use graphql instead of rest when auth token is available
+// TODO: Maybe rewrite to use graphql instead of rest when auth token is available?
 
 
 // query GetSelfStarredRepos($username: String!) {

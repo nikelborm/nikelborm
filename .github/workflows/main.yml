@@ -32,7 +32,7 @@ jobs:
       -
         name: 'Execute'
         run: |
-          ./dist/index.js
+          ./dist/renderReadme.js
       -
         name: Commit updated README.md, images, package-lock.json if changed
         uses: stefanzweifel/git-auto-commit-action@v5
