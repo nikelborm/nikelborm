@@ -33,6 +33,7 @@ jobs:
         name: 'Execute'
         run: |
           ./dist/renderReadme.js
+          ./dist/purgeUselessImages.js
       -
         name: Commit updated README.md, images, package-lock.json if changed
         uses: stefanzweifel/git-auto-commit-action@v5
