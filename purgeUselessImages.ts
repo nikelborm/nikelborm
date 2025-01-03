@@ -1,6 +1,5 @@
 import { END_TOKEN, README_FILE_PATH, START_TOKEN } from 'constants.js';
-import { readdir, readFile } from 'node:fs/promises';
-import { rimraf } from 'rimraf'
+import { readdir, readFile, rm } from 'node:fs/promises';
 import path from 'node:path';
 import { splitStringApart } from 'src/splitStringApart.js';
 import { extractReposFromMarkdownSoft } from 'src/markdownPinToAndFrom.js';
@@ -32,7 +31,11 @@ const removalTargets = presentImageFileNames.difference(expectedToHaveImageFileN
 
 process.chdir('./images');
 
-await rimraf([...removalTargets]);
+await Promise.allSettled(
+  [...removalTargets].map(
+    p => rm(p, { recursive: true, force: true })
+  )
+);
 
 console.log(
   `Deleted following files in images folder:`,
