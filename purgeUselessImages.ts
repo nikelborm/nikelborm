@@ -1,9 +1,12 @@
-import { END_TOKEN, README_FILE_PATH, START_TOKEN } from 'constants.js';
-import { readdir, readFile, rm } from 'node:fs/promises';
+#!/usr/bin/env node
+
+import { END_TOKEN, README_FILE_PATH, START_TOKEN } from './constants.js';
+import { readdir, readFile } from 'node:fs/promises';
 import path from 'node:path';
-import { splitStringApart } from 'src/splitStringApart.js';
-import { extractReposFromMarkdownSoft } from 'src/markdownPinToAndFrom.js';
-import { getPathToImageInRepo } from 'src/getPathToImageInRepo.js';
+import { splitStringApart } from './src/splitStringApart.js';
+import { rimraf } from 'rimraf';
+import { extractReposFromMarkdownSoft } from './src/markdownPinToAndFrom.js';
+import { getPathToImageInRepo } from './src/getPathToImageInRepo.js';
 
 const oldReadme = await readFile(README_FILE_PATH, 'utf8');
 
@@ -22,20 +25,20 @@ const expectedToHaveImageFileNames = new Set(
     )))
 );
 
+console.log('Expected to have image file names: ', expectedToHaveImageFileNames);
+
 const presentImageFileNames = new Set(
   (await readdir('./images'))
     .filter(e => !['.gitkeep', '.gitignore'].includes(e))
 );
 
+console.log('Present image file names: ', presentImageFileNames);
+
 const removalTargets = presentImageFileNames.difference(expectedToHaveImageFileNames);
 
 process.chdir('./images');
 
-await Promise.allSettled(
-  [...removalTargets].map(
-    p => rm(p, { recursive: true, force: true })
-  )
-);
+await rimraf([...removalTargets])
 
 console.log(
   `Deleted following files in images folder:`,
