@@ -94,7 +94,7 @@ try {
 if (process.env['MOCK_API'] !== 'true')
   await writeFile( // saving it for later use to publish as Actions artifact
     './reposCreatedAndStarredByMe.json',
-    JSON.stringify(fetchedReposWithPins.map(_ => _.repo))
+    JSON.stringify(fetchedReposWithPins.map(_ => _.repo), null, 2)
   );
 
 await Promise.all(fetchedReposWithPins.map(_ => _.pinRefreshPromise));
