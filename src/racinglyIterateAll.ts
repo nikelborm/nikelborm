@@ -27,6 +27,9 @@ export async function* racinglyIterateAll<
   const errors: RacingIterationError[] = [];
 
   while (mapOfIndexesToNotYetYieldedRacers.size > 0) {
+    // remember that Promise.race may hang if given empty iterator. In
+    // current condition we already checking for that with `while` cycle
+    // condition
     const racer = await Promise.race(
       mapOfIndexesToNotYetYieldedRacers.values()
     );
@@ -39,10 +42,7 @@ export async function* racinglyIterateAll<
       if (failLate) {
         errors.push(racingIterationError);
       } else {
-        for (const key of mapOfIndexesToNotYetYieldedRacers.keys()) {
-          // call according signal.abort()
-          mapOfIndexesToNotYetYieldedRacers.delete(key);
-        };
+        // TODO: call signal.abort() for each mapOfIndexesToNotYetYieldedRacers
         throw racingIterationError;
       }
     } else {
