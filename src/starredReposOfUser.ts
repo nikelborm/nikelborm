@@ -2,6 +2,8 @@ import { Octokit } from '@octokit/core';
 import { parseLinkHeader } from './parseLinkHeader.js';
 import { racinglyIterateAll } from './racinglyIterateAll.js';
 import { IRepo } from './repo.interface.js';
+import { addOrdinalSuffixTo } from './addOrdinalSuffixToNumber.js';
+import { outdent } from 'outdent';
 
 export async function* starredReposOfUser(username: string, per_page: number) {
   console.log(`Started fetching pages of ${username}'s starred repos`);
@@ -20,16 +22,23 @@ export async function* starredReposOfUser(username: string, per_page: number) {
 
   if (!lastPage) return;
 
-  for await (const { index, result: { repos } } of racinglyIterateAll(Array.from(
+  const promisesToGetRestOfThePages = Array.from(
     { length: lastPage - 1 },
     (_, index) => requestPageOfStarredRepos({
       page: index + 2,
       per_page,
       username,
     })
-  ))) {
-    const page = index + 2;
-    console.log( `Racingly fetched ${ordinalSuffixOf(page)} page out of all ${lastPage} pages`);
+  );
+
+  for await (const { result: { repos, page } } of racinglyIterateAll(
+    promisesToGetRestOfThePages,
+    true
+  )) {
+    console.log(outdent({ newline: '' })`
+      Racingly fetched ${addOrdinalSuffixTo(page)}
+      page out of all ${lastPage} pages
+    `);
 
     yield* repos;
   }
@@ -52,20 +61,25 @@ async function requestPageOfStarredRepos({
     'requestPageOfStarredRepos accepts only non-empty strings as username'
   );
 
+  // TODO: detach client
   const octokit = new Octokit();
 
-  const { data, headers } = await octokit.request('GET /users/{username}/starred', {
-    username,
-    per_page,
-    direction: 'desc', // newest updated go first
-    page,
-    sort: 'updated',
-    headers: {
-      'X-GitHub-Api-Version': '2022-11-28'
-    },
-  });
+  const { data, headers } = await octokit.request(
+    'GET /users/{username}/starred',
+    {
+      username,
+      per_page,
+      page,
+      sort: 'updated',
+      direction: 'desc', // newest updated go first
+      headers: {
+        'X-GitHub-Api-Version': '2022-11-28'
+      },
+    }
+  );
 
   return {
+    page,
     linkHeader: parseLinkHeader(headers.link),
     repos: data.map(e => {
       const repo = 'repo' in e ? e.repo : e;
@@ -82,19 +96,4 @@ async function requestPageOfStarredRepos({
       } satisfies IRepo
     })
   }
-}
-
-function ordinalSuffixOf(i: number) {
-  let j = i % 10,
-      k = i % 100;
-  if (j === 1 && k !== 11) {
-      return i + "st";
-  }
-  if (j === 2 && k !== 12) {
-      return i + "nd";
-  }
-  if (j === 3 && k !== 13) {
-      return i + "rd";
-  }
-  return i + "th";
 }

@@ -1,7 +1,7 @@
 export async function* racinglyIterateAll<
   U extends Array<Promise<unknown>> | [Promise<unknown>]
 >(promises: U, failLate?: boolean) {
-  let map = new Map(
+  const mapOfIndexToNotYetYieldedRacer = new Map(
     promises.map(
       (promise, index) => [
         index,
@@ -26,8 +26,8 @@ export async function* racinglyIterateAll<
 
   const errors: RacingIterationError[] = [];
 
-  while (map.size > 0) {
-    const racer = await Promise.race(map.values());
+  while (mapOfIndexToNotYetYieldedRacer.size > 0) {
+    const racer = await Promise.race(mapOfIndexToNotYetYieldedRacer.values());
 
     if (racer.status === 'error') {
       const racingIterationError = new RacingIterationError(
@@ -37,13 +37,14 @@ export async function* racinglyIterateAll<
       if (failLate) {
         errors.push(racingIterationError);
       } else {
-        for (const key of map.keys()) {
-          map.delete(key);
+        for (const key of mapOfIndexToNotYetYieldedRacer.keys()) {
+          // call according signal.abort()
+          mapOfIndexToNotYetYieldedRacer.delete(key);
         };
         throw racingIterationError;
       }
     } else {
-      map.delete(racer.index);
+      mapOfIndexToNotYetYieldedRacer.delete(racer.index);
       yield {
         index: racer.index,
         result: racer.result,
