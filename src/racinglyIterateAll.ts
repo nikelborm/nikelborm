@@ -1,7 +1,7 @@
 export async function* racinglyIterateAll<
   U extends Array<Promise<unknown>> | [Promise<unknown>]
 >(promises: U, failLate?: boolean) {
-  const mapOfIndexToNotYetYieldedRacer = new Map(
+  const mapOfIndexesToNotYetYieldedRacers = new Map(
     promises.map(
       (promise, index) => [
         index,
@@ -26,8 +26,10 @@ export async function* racinglyIterateAll<
 
   const errors: RacingIterationError[] = [];
 
-  while (mapOfIndexToNotYetYieldedRacer.size > 0) {
-    const racer = await Promise.race(mapOfIndexToNotYetYieldedRacer.values());
+  while (mapOfIndexesToNotYetYieldedRacers.size > 0) {
+    const racer = await Promise.race(
+      mapOfIndexesToNotYetYieldedRacers.values()
+    );
 
     if (racer.status === 'error') {
       const racingIterationError = new RacingIterationError(
@@ -37,14 +39,14 @@ export async function* racinglyIterateAll<
       if (failLate) {
         errors.push(racingIterationError);
       } else {
-        for (const key of mapOfIndexToNotYetYieldedRacer.keys()) {
+        for (const key of mapOfIndexesToNotYetYieldedRacers.keys()) {
           // call according signal.abort()
-          mapOfIndexToNotYetYieldedRacer.delete(key);
+          mapOfIndexesToNotYetYieldedRacers.delete(key);
         };
         throw racingIterationError;
       }
     } else {
-      mapOfIndexToNotYetYieldedRacer.delete(racer.index);
+      mapOfIndexesToNotYetYieldedRacers.delete(racer.index);
       yield {
         index: racer.index,
         result: racer.result,
