@@ -13,27 +13,28 @@ export function getPinsSortedByTheirProbablePopularity(fetchedReposWithPins: {
   const minForks = aggParam('min', 'fork');
 
   return fetchedReposWithPins
-    .map(({ repo: r, pin }) => {
-      const normalizedStarsFactor = (r.starCount - minStars) / (maxStars - minStars);
-      const normalizedForksFactorWithAdjustedValue = (r.forkCount - minForks) / (maxForks - minForks) * 0.25;
+    .map(({ repo, pin }) => {
+      const normalizedStarsFactor = (repo.starCount - minStars) / (maxStars - minStars);
+      const normalizedForksFactorWithAdjustedValue = (repo.forkCount - minForks) / (maxForks - minForks) * 0.25;
       const publicityFactor = normalizedStarsFactor
         + normalizedForksFactorWithAdjustedValue;
       // publicityFactor: min=0, max=1.25
-      // Five popularity classes
-      // 0 ... 0, 0 ... 0.25, 0.25 ... 0.5, 0.5 ... 0.75, 0.75 ... 0.1, 1 ... 1.25;
+      // 6 popularity classes:
+      // 0, 0 ... 0.25, 0.25 ... 0.5, 0.5 ... 0.75, 0.75 ... 0.1, 1 ... 1.25;
       return {
-        pin: pin,
-        templateFactor: +r.isTemplate,
-        boilerplateFactor: +r.name.includes('boiler'),
-        archiveFactor: +r.isItArchived,
-        hackathonFactor: +r.name.includes('hackathon'),
-        experimentFactor: +r.name.includes('experiment'),
-        pushRecencyFactor: Number(r.lastTimeBeenPushedInto),
+        pin,
+        templateFactor: +repo.isTemplate,
+        boilerplateFactor: +repo.name.includes('boiler'),
+        archiveFactor: +repo.isItArchived,
+        hackathonFactor: +repo.name.includes('hackathon'),
+        experimentFactor: +repo.name.includes('experiment'),
+        pushRecencyFactor: Number(repo.lastTimeBeenPushedInto),
+        // 0 will get their separate class at the bottom
         publicityClassFactor: Math.ceil(publicityFactor / 0.25)
       }
     })
     .sort((a, b) => {
-      // `extends infer K` needed to run type distribution
+      // `extends infer K` needed to activate type distribution
       type Factor = keyof typeof a extends infer K ? K extends `${infer U}Factor` ? U : never : never;
       const smallestFirst = (f: Factor) => a[`${f}Factor`] - b[`${f}Factor`];
       const biggestFirst = (f: Factor) => -smallestFirst(f);
