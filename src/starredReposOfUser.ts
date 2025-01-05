@@ -18,7 +18,10 @@ export async function* starredReposOfUser(username: string, per_page: number) {
 
   const lastPage = linkHeader.last?.page || linkHeader.next?.page
 
-  console.log( `Fetched first out of ${lastPage ?? 1} pages`);
+  console.log(`Fetched the first ` + (lastPage
+    ? `out of ${lastPage} pages`
+    : `page, which is also the only one here`
+  ));
 
   if (!lastPage) return;
 
