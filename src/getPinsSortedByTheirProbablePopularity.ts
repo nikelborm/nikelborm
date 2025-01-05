@@ -20,7 +20,7 @@ export function getPinsSortedByTheirProbablePopularity(fetchedReposWithPins: {
         + normalizedForksFactorWithAdjustedValue;
       // publicityFactor: min=0, max=1.25
       // Five popularity classes
-      // 0 ... 0.25, 0.25 ... 0.5, 0.5 ... 0.75, 0.75 ... 0.1, 1 ... 1.25;
+      // 0 ... 0, 0 ... 0.25, 0.25 ... 0.5, 0.5 ... 0.75, 0.75 ... 0.1, 1 ... 1.25;
       return {
         pin: pin,
         templateFactor: +r.isTemplate,
@@ -29,12 +29,7 @@ export function getPinsSortedByTheirProbablePopularity(fetchedReposWithPins: {
         hackathonFactor: +r.name.includes('hackathon'),
         experimentFactor: +r.name.includes('experiment'),
         pushRecencyFactor: Number(r.lastTimeBeenPushedInto),
-        publicityClassFactor:
-            publicityFactor > 1  ? 5 :
-          publicityFactor > 0.75 ? 4 :
-          publicityFactor > 0.5  ? 3 :
-          publicityFactor > 0.25 ? 2 :
-          1
+        publicityClassFactor: Math.ceil(publicityFactor / 0.25)
       }
     })
     .sort((a, b) => {
