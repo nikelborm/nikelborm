@@ -33,5 +33,3 @@
 <!-- REPO-TABLE-INJECT-END -->
 
 UPD: damn I just realized that it would be just a list of literally my EVERY repo I have because I have warm feelings for each and every one of them. Don't know what to do. Maybe I'll find another criteria for listing them here...
-
-1. TODO: Add [lowlighter/metrics](https://github.com/lowlighter/metrics)?
