@@ -48,7 +48,7 @@ jobs:
         name: Preserve self starred repos list
         uses: actions/upload-artifact@v4
         with:
-          name: Repos created and starred by me
+          name: Repos_created_and_starred_by_me
           path: ./reposCreatedAndStarredByMe.json
           if-no-files-found: error
           retention-days: 15
