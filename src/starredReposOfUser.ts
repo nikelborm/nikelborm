@@ -16,28 +16,30 @@ export async function* starredReposOfUser(username: string, per_page: number) {
 
   yield* repos;
 
-  const lastPage = linkHeader.last?.page || linkHeader.next?.page
+  const lastPage = linkHeader.last?.page || linkHeader.next?.page;
 
-  console.log(`Fetched the first ` + (lastPage
-    ? `out of ${lastPage} pages`
-    : `page, which is also the only one here`
-  ));
+  console.log(
+    `Fetched the first ` +
+      (lastPage
+        ? `out of ${lastPage} pages`
+        : `page, which is also the only one here`),
+  );
 
   if (!lastPage) return;
 
   const promisesToGetRestOfThePages = Array.from(
     { length: lastPage - 1 },
-    (_, index) => requestPageOfStarredRepos({
-      page: index + 2,
-      per_page,
-      username,
-    })
+    (_, index) =>
+      requestPageOfStarredRepos({
+        page: index + 2,
+        per_page,
+        username,
+      }),
   );
 
-  for await (const { result: { repos, page } } of racinglyIterateAll(
-    promisesToGetRestOfThePages,
-    true
-  )) {
+  for await (const {
+    result: { repos, page },
+  } of racinglyIterateAll(promisesToGetRestOfThePages, true)) {
     console.log(outdent({ newline: '' })`
       Racingly fetched ${addOrdinalSuffixTo(page)}
       page out of all ${lastPage} pages
@@ -52,17 +54,19 @@ async function requestPageOfStarredRepos({
   username,
   per_page,
 }: {
-  page: number,
-  username: string,
-  per_page: number,
+  page: number;
+  username: string;
+  per_page: number;
 }) {
-  if (per_page <= 0 || per_page > 100) throw new Error(
-    'requestPageOfStarredRepos accepts only 0 < per_page <= 100'
-  );
+  if (per_page <= 0 || per_page > 100)
+    throw new Error(
+      'requestPageOfStarredRepos accepts only 0 < per_page <= 100',
+    );
 
-  if (!username) throw new Error(
-    'requestPageOfStarredRepos accepts only non-empty strings as username'
-  );
+  if (!username)
+    throw new Error(
+      'requestPageOfStarredRepos accepts only non-empty strings as username',
+    );
 
   // TODO: detach client
   const octokit = new Octokit();
@@ -76,9 +80,9 @@ async function requestPageOfStarredRepos({
       sort: 'updated',
       direction: 'desc', // newest updated go first
       headers: {
-        'X-GitHub-Api-Version': '2022-11-28'
+        'X-GitHub-Api-Version': '2022-11-28',
       },
-    }
+    },
   );
 
   return {
@@ -96,7 +100,7 @@ async function requestPageOfStarredRepos({
         lastTimeBeenPushedInto: repo.pushed_at
           ? new Date(repo.pushed_at)
           : null,
-      } satisfies IRepo
-    })
-  }
+      } satisfies IRepo;
+    }),
+  };
 }

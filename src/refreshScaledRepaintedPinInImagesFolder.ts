@@ -6,30 +6,30 @@ import { getOriginalDarkThemePinURL } from './getPinURLs.js';
 import type { IMiniRepo } from './repo.interface.js';
 import { themes } from './themes.js';
 
-export async function refreshScaledRepaintedPinInImagesFolder({ owner, name }: IMiniRepo) {
-  const {
-    originalDarkThemePinSVG,
-    originalDarkThemePinURL
-  } = await fetchOriginalDarkThemePin({ owner, name });
+export async function refreshScaledRepaintedPinInImagesFolder({
+  owner,
+  name,
+}: IMiniRepo) {
+  const { originalDarkThemePinSVG, originalDarkThemePinURL } =
+    await fetchOriginalDarkThemePin({ owner, name });
   console.log(`Fetched original repo pin { owner:"${owner}", name:"${name}" }`);
 
-  const scaledRepaintedPinSVGs = getScaledRepaintedRepoPins(originalDarkThemePinSVG);
+  const scaledRepaintedPinSVGs = getScaledRepaintedRepoPins(
+    originalDarkThemePinSVG,
+  );
 
   const writtenPaths = await Promise.all(
-    themes.map(async (theme) => {
+    themes.map(async theme => {
       const filePath = getPathToImageInRepo({ owner, name }, theme);
-      await writeFile(
-        filePath,
-        scaledRepaintedPinSVGs[`${theme}ThemePinSVG`]
-      );
+      await writeFile(filePath, scaledRepaintedPinSVGs[`${theme}ThemePinSVG`]);
       return filePath;
-    })
+    }),
   );
 
   console.log(outdent`
-Written files:
-${writtenPaths.map(v => '- ' + v).join('\n')}
-Those files are transformed versions of ${originalDarkThemePinURL}\n
+    Written files:
+    ${writtenPaths.map(v => '- ' + v).join('\n')}
+    Those files are transformed versions of ${originalDarkThemePinURL}\n
   `);
 }
 
@@ -37,15 +37,16 @@ async function fetchOriginalDarkThemePin(repo: IMiniRepo) {
   const originalDarkThemePinURL = getOriginalDarkThemePinURL(repo);
 
   console.log(`Started fetching repo pin ` + JSON.stringify(repo));
-  const { statusCode, body } = await request(originalDarkThemePinURL)
+  const { statusCode, body } = await request(originalDarkThemePinURL);
 
-  if (statusCode !== 200) throw new Error(
-    `statusCode=${statusCode}: Failed to fetch repo pin image for ${originalDarkThemePinURL}`
-  );
+  if (statusCode !== 200)
+    throw new Error(
+      `statusCode=${statusCode}: Failed to fetch repo pin image for ${originalDarkThemePinURL}`,
+    );
 
   return {
     originalDarkThemePinURL,
-    originalDarkThemePinSVG: await body.text()
+    originalDarkThemePinSVG: await body.text(),
   };
 }
 
@@ -62,10 +63,9 @@ function getScaledRepaintedRepoPins(originalDarkThemePinSVG: string) {
     .replaceAll('viewBox="0 0 400 150"', 'viewBox="24 27 385 100"')
     .replaceAll('viewBox="0 0 400 140"', 'viewBox="24 27 385 90"')
     .replaceAll('viewBox="0 0 400 120"', 'viewBox="24 27 385 70"')
-    .replaceAll(/\s+/mg, ' ');
+    .replaceAll(/\s+/gm, ' ');
 
-  const lightThemePinSVG = darkThemePinSVG
-    .replaceAll('#f0f6fc', '#1f2328');
+  const lightThemePinSVG = darkThemePinSVG.replaceAll('#f0f6fc', '#1f2328');
 
   return { darkThemePinSVG, lightThemePinSVG };
 }

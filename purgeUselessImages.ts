@@ -19,28 +19,35 @@ const { middlePartWithoutTokens } = splitStringApart({
 const expectedToHaveImageFileNames = new Set(
   extractReposFromMarkdownSoft(middlePartWithoutTokens)
     .filter(e => e.imageHost === 'raw.githubusercontent.com')
-    .map(e => path.basename(getPathToImageInRepo(
-      { name: e.repoName, owner: e.username },
-      e.themeName
-    )))
+    .map(e =>
+      path.basename(
+        getPathToImageInRepo(
+          { name: e.repoName, owner: e.username },
+          e.themeName,
+        ),
+      ),
+    ),
 );
 
-console.log('Expected to have image file names: ', expectedToHaveImageFileNames);
+console.log(
+  'Expected to have image file names: ',
+  expectedToHaveImageFileNames,
+);
 
 const presentImageFileNames = new Set(
-  (await readdir('./images'))
-    .filter(e => !['.gitkeep', '.gitignore'].includes(e))
+  (await readdir('./images')).filter(
+    e => !['.gitkeep', '.gitignore'].includes(e),
+  ),
 );
 
 console.log('Present image file names: ', presentImageFileNames);
 
-const removalTargets = presentImageFileNames.difference(expectedToHaveImageFileNames);
+const removalTargets = presentImageFileNames.difference(
+  expectedToHaveImageFileNames,
+);
 
 process.chdir('./images');
 
-await rimraf([...removalTargets])
+await rimraf([...removalTargets]);
 
-console.log(
-  `Deleted following files in images folder:`,
-  removalTargets
-);
+console.log(`Deleted following files in images folder:`, removalTargets);

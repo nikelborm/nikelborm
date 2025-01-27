@@ -9,23 +9,25 @@
     "build": "tsc && chmod +x ./dist/renderReadme.js ./dist/purgeUselessImages.js",
     "start": "tsx watch --env-file=.env --clear-screen ./renderReadme.ts",
     "purge": "tsx ./purgeUselessImages.ts",
+    "format": "prettier . --write",
     "once": "tsx --env-file=.env ./renderReadme.ts"
   },
   "dependencies": {
-    "@octokit/core": "^6.1.2",
+    "@octokit/core": "^6.1.3",
     "outdent": "^0.8.0",
     "parse-link-header": "^2.0.0",
-    "undici": "^7.2.3",
+    "undici": "^7.3.0",
     "zod": "^3.24.1"
   },
   "devDependencies": {
     "@total-typescript/ts-reset": "^0.5.1",
-    "@types/node": "^22.10.2",
+    "@types/node": "^22.10.10",
     "@types/parse-link-header": "^2.0.3",
     "@vercel/ncc": "^0.38.3",
+    "prettier": "^3.4.2",
     "rimraf": "^6.0.1",
     "tsx": "^4.19.2",
-    "typescript": "^5.7.2"
+    "typescript": "^5.7.3"
   },
   "keywords": [],
   "homepage": "https://github.com/nikelborm",

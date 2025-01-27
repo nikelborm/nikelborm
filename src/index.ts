@@ -1,6 +1,6 @@
+export * from './addOrdinalSuffixToNumber.js';
 export * from './getEnvVarOrFail.js';
 export * from './getMockRepos.js';
-export * from './addOrdinalSuffixToNumber.js';
 export * from './getPathToImageInRepo.js';
 export * from './getPinsSortedByTheirProbablePopularity.js';
 export * from './getPinURLs.js';

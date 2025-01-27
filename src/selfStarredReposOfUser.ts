@@ -26,12 +26,11 @@ export async function* selfStarredReposOfUser(username: string) {
 
   // So I chose the first way.
   for await (const repo of starredReposOfUser(username, 100)) {
-    if (repo.owner === username) yield repo
+    if (repo.owner === username) yield repo;
   }
 }
 
 // TODO: Maybe rewrite to use graphql instead of rest when auth token is available?
-
 
 // query GetSelfStarredRepos($username: String!) {
 //   user(login: $username) {
