@@ -1,10 +1,13 @@
 import { writeFile } from 'node:fs/promises';
+import { Data, Equal, Schema } from 'effect';
 import { outdent } from 'outdent';
 import { request } from 'undici';
 import { getPathToImageInRepo } from './getPathToImageInRepo.js';
 import { getOriginalDarkThemePinURL } from './getPinURLs.js';
 import type { IMiniRepo } from './repo.interface.js';
 import { themes } from './themes.js';
+
+const schema = Schema.Struct({});
 
 export async function refreshScaledRepaintedPinInImagesFolder({
   owner,
