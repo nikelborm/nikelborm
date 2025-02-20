@@ -1,4 +1,4 @@
-## Normalize sharing scrappy fiddles
+## [Normalize](https://www.todepond.com/sky/normalise-dont-share-lol/) <!-- I want to lead by example --> sharing [scrappy fiddles](https://www.todepond.com/wikiblogarden/scrappy-fiddles/sharing/normalising/live/)
 
 ### Subset of my repos (including drafts) I believe is promising, interesting, fun, and just the stuff I'm proud of or loved creating (because repo pins are limited)
 
