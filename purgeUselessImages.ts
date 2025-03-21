@@ -3,21 +3,21 @@
 import { END_TOKEN, README_FILE_PATH, START_TOKEN } from './constants.js';
 import { readdir, readFile } from 'node:fs/promises';
 import path from 'node:path';
-import { splitStringApart } from './src/splitStringApart.js';
+import { TokenReplacer } from './src/splitStringApart.js';
 import { rimraf } from 'rimraf';
 import { extractReposFromMarkdownSoft } from './src/markdownPinToAndFrom.js';
 import { getPathToImageInRepo } from './src/getPathToImageInRepo.js';
 
 const oldReadme = await readFile(README_FILE_PATH, 'utf8');
 
-const { middlePartWithoutTokens } = splitStringApart({
-  initialStringToSplit: oldReadme,
-  startToken: START_TOKEN,
-  endToken: END_TOKEN,
+const replacer = new TokenReplacer(oldReadme, {
+  repos: [START_TOKEN, END_TOKEN],
 });
 
 const expectedToHaveImageFileNames = new Set(
-  extractReposFromMarkdownSoft(middlePartWithoutTokens)
+  extractReposFromMarkdownSoft(
+    replacer.getPartsOnFirstMatchOrThrow('repos').targetPartExcludingTokens,
+  )
     .filter(e => e.imageHost === 'raw.githubusercontent.com')
     .map(e =>
       path.basename(
