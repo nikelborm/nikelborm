@@ -1,6 +1,6 @@
 ## [Normalize](https://www.todepond.com/sky/normalise-dont-share-lol/) <!-- I want to lead by example --> sharing [scrappy fiddles](https://www.todepond.com/wikiblogarden/scrappy-fiddles/sharing/normalising/live/)
 
-### Subset of my repos (mostly drafts/unfinished) I believe is promising, interesting, fun, and just the stuff I'm proud of or loved creating (because repo pins are limited)
+### Below is the subset of my repos (mostly drafts/unfinished) which I believe is either promising, interesting, fun, or just the stuff I'm proud of or loved creating (because repo pins are limited)
 
 (🥺👉👈 Sorry for the absence of Readmes 🥺👉👈)
 

@@ -6,18 +6,26 @@ export function getPinsSortedByTheirProbablePopularity(
     pin: string;
   }[],
 ) {
-  const aggParam = (agg: 'min' | 'max', param: 'star' | 'fork') =>
-    Math[agg](...fetchedReposWithPins.map(_ => _.repo[`${param}Count`]));
+  const getAggregatedParameter = (
+    aggregationType: 'min' | 'max',
+    parameter: 'star' | 'fork',
+  ) =>
+    Math[aggregationType](
+      ...fetchedReposWithPins.map(_ => _.repo[`${parameter}Count`]),
+    );
 
-  const maxStars = aggParam('max', 'star');
-  const minStars = aggParam('min', 'star');
-  const maxForks = aggParam('max', 'fork');
-  const minForks = aggParam('min', 'fork');
+  const maxStars = getAggregatedParameter('max', 'star');
+  const minStars = getAggregatedParameter('min', 'star');
+  const maxForks = getAggregatedParameter('max', 'fork');
+  const minForks = getAggregatedParameter('min', 'fork');
 
   return fetchedReposWithPins
     .map(({ repo, pin }) => {
       const normalizedStarsFactor =
         (repo.starCount - minStars) / (maxStars - minStars);
+      // I have too little forks, so that repo have either 0 or 1 forks, and it
+      // affects coefficient too much, hence I added 0.25 to bring impact a
+      // little down
       const normalizedForksFactorWithAdjustedValue =
         ((repo.forkCount - minForks) / (maxForks - minForks)) * 0.25;
       const publicityFactor =
@@ -25,6 +33,8 @@ export function getPinsSortedByTheirProbablePopularity(
       // publicityFactor: min=0, max=1.25
       // 6 popularity classes:
       // 0, 0 ... 0.25, 0.25 ... 0.5, 0.5 ... 0.75, 0.75 ... 0.1, 1 ... 1.25;
+
+      // TODO: remove top 5% spikes to make factor a little fairer
       return {
         pin,
         templateFactor: +repo.isTemplate,
@@ -46,7 +56,7 @@ export function getPinsSortedByTheirProbablePopularity(
         : never;
       const smallestFirst = (f: Factor) => a[`${f}Factor`] - b[`${f}Factor`];
       const biggestFirst = (f: Factor) => -smallestFirst(f);
-      let _: any;
+      let _: number;
 
       if ((_ = biggestFirst('template'))) return _;
       if ((_ = biggestFirst('boilerplate'))) return _;
