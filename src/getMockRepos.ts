@@ -1,18 +1,20 @@
 import { readFile } from 'node:fs/promises';
 import { IRepo, RepoZodSchema } from './repo.interface.js';
+import path from 'node:path';
 
 export async function getMockRepos(owner: string) {
+  const previouslySavedFilePath = path.join(
+    process.cwd(),
+    './reposCreatedAndStarredByMe.json',
+  );
+
   try {
-    const fileContents = await readFile(
-      './reposCreatedAndStarredByMe.json',
-      'utf-8',
-    );
-    /* searches for this file relative to CWD */
+    const fileContents = await readFile(previouslySavedFilePath, 'utf-8');
 
     return RepoZodSchema.array().parse(JSON.parse(fileContents));
   } catch (error) {
     console.error(
-      'Error while loading ./reposCreatedAndStarredByMe.json. Falling back to primitive mock',
+      `Error while loading ${previouslySavedFilePath}. Falling back to primitive mock.\n`,
       error,
     );
     return ['apache-superset-quick-init', 'download-github-folder'].map(
