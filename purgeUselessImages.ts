@@ -2,11 +2,10 @@
 
 import { END_TOKEN, README_FILE_PATH, START_TOKEN } from './constants.js';
 import { readdir, readFile } from 'node:fs/promises';
-import path from 'node:path';
 import { TokenReplacer } from './src/splitStringApart.js';
 import { rimraf } from 'rimraf';
 import { extractReposFromMarkdownSoft } from './src/markdownPinToAndFrom.js';
-import { getPathToImageInRepo } from './src/getPathToImageInRepo.js';
+import { getImageFileName } from './src/getPathToImageInRepo.js';
 
 const oldReadme = await readFile(README_FILE_PATH, 'utf8');
 
@@ -14,18 +13,14 @@ const replacer = new TokenReplacer(oldReadme, {
   repos: [START_TOKEN, END_TOKEN],
 });
 
+const reposMarkdownTableString =
+  replacer.getPartsOnFirstMatchOrThrow('repos').targetPartExcludingTokens;
+
 const expectedToHaveImageFileNames = new Set(
-  extractReposFromMarkdownSoft(
-    replacer.getPartsOnFirstMatchOrThrow('repos').targetPartExcludingTokens,
-  )
+  extractReposFromMarkdownSoft(reposMarkdownTableString)
     .filter(e => e.imageHost === 'raw.githubusercontent.com')
     .map(e =>
-      path.basename(
-        getPathToImageInRepo(
-          { name: e.repoName, owner: e.username },
-          e.themeName,
-        ),
-      ),
+      getImageFileName({ name: e.repoName, owner: e.username }, e.themeName),
     ),
 );
 

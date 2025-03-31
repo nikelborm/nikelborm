@@ -1,7 +1,7 @@
 import { writeFile } from 'node:fs/promises';
 import { outdent } from 'outdent';
 import { request } from 'undici';
-import { getPathToImageInRepo } from './getPathToImageInRepo.js';
+import { getPathToImageInRepoRelativeToRepoRoot } from './getPathToImageInRepo.js';
 import { getOriginalDarkThemePinURL } from './getPinURLs.js';
 import type { IMiniRepo } from './repo.interface.js';
 import { themes } from './themes.js';
@@ -20,7 +20,10 @@ export async function refreshScaledRepaintedPinInImagesFolder({
 
   const writtenPaths = await Promise.all(
     themes.map(async theme => {
-      const filePath = getPathToImageInRepo({ owner, name }, theme);
+      const filePath = getPathToImageInRepoRelativeToRepoRoot(
+        { owner, name },
+        theme,
+      );
       await writeFile(filePath, scaledRepaintedPinSVGs[`${theme}ThemePinSVG`]);
       return filePath;
     }),

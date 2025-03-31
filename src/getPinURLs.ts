@@ -1,4 +1,4 @@
-import { getPathToImageInRepo } from './getPathToImageInRepo.js';
+import { getPathToImageInRepoRelativeToRepoRoot } from './getPathToImageInRepo.js';
 import type { IMiniRepo } from './repo.interface.js';
 import type { Theme } from './themes.js';
 
@@ -8,7 +8,7 @@ export function getScaledRepaintedRepoPinURL(
 ) {
   return (
     `https://raw.githubusercontent.com/${owner}/${owner}/refs/heads/main/` +
-    getPathToImageInRepo({ owner, name }, theme)
+    getPathToImageInRepoRelativeToRepoRoot({ owner, name }, theme)
   );
 }
 
