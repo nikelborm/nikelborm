@@ -14,7 +14,7 @@ export async function refreshScaledRepaintedPinInImagesFolder({
     await fetchOriginalDarkThemePin({ owner, name });
   console.log(`Fetched original repo pin { owner:"${owner}", name:"${name}" }`);
 
-  const scaledRepaintedPinSVGs = getScaledRepaintedRepoPins(
+  const scaledRepaintedPinSVGs = cutOffMarginsAndRepaintRepoPin(
     originalDarkThemePinSVG,
   );
 
@@ -54,7 +54,7 @@ async function fetchOriginalDarkThemePin(repo: IMiniRepo) {
   };
 }
 
-function getScaledRepaintedRepoPins(originalDarkThemePinSVG: string) {
+function cutOffMarginsAndRepaintRepoPin(originalDarkThemePinSVG: string) {
   const darkThemePinSVG = originalDarkThemePinSVG
     // .replaceAll('#008088', /* title_color  */ 'var(--fgColor-default, var(--color-fg-default))')
     // .replaceAll('#880800', /* text_color   */ 'var(--fgColor-default, var(--color-fg-default))')
