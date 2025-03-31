@@ -29,10 +29,10 @@ console.log(
   expectedToHaveImageFileNames,
 );
 
+process.chdir('./images');
+
 const presentImageFileNames = new Set(
-  (await readdir('./images')).filter(
-    e => !['.gitkeep', '.gitignore'].includes(e),
-  ),
+  (await readdir('.')).filter(e => !['.gitkeep', '.gitignore'].includes(e)),
 );
 
 console.log('Present image file names: ', presentImageFileNames);
@@ -40,8 +40,6 @@ console.log('Present image file names: ', presentImageFileNames);
 const removalTargets = presentImageFileNames.difference(
   expectedToHaveImageFileNames,
 );
-
-process.chdir('./images');
 
 await rimraf([...removalTargets]);
 
