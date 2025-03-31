@@ -2,7 +2,7 @@ import { writeFile } from 'node:fs/promises';
 import { outdent } from 'outdent';
 import { request } from 'undici';
 import { getPathToImageInRepoRelativeToRepoRoot } from './getPathToImageInRepo.js';
-import { getOriginalDarkThemePinURL } from './getPinURLs.js';
+import { getDarkThemePinUrlFromGithubReadmeStatsService } from './getPinURLs.js';
 import type { IMiniRepo } from './repo.interface.js';
 import { themes } from './themes.js';
 
@@ -37,7 +37,8 @@ export async function refreshScaledRepaintedPinInImagesFolder({
 }
 
 async function fetchOriginalDarkThemePin(repo: IMiniRepo) {
-  const originalDarkThemePinURL = getOriginalDarkThemePinURL(repo);
+  const originalDarkThemePinURL =
+    getDarkThemePinUrlFromGithubReadmeStatsService(repo);
 
   console.log(`Started fetching repo pin ` + JSON.stringify(repo));
   const { statusCode, body } = await request(originalDarkThemePinURL);

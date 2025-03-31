@@ -2,8 +2,8 @@ import type { IMiniRepo } from './repo.interface.js';
 import { z } from 'zod';
 import { themes } from './themes.js';
 import {
-  getOriginalDarkThemePinURL,
-  getScaledRepaintedRepoPinURL,
+  getDarkThemePinUrlFromGithubReadmeStatsService,
+  getUrlOfScaledRepaintedRepoPinInGithubCdn,
 } from './getPinURLs.js';
 import { outdent } from 'outdent';
 import path from 'node:path';
@@ -15,7 +15,7 @@ export function getScaledRepaintedMarkdownPin(repo: IMiniRepo) {
         theme,
         getMarkdownPin(
           repo.name,
-          getScaledRepaintedRepoPinURL(repo, theme),
+          getUrlOfScaledRepaintedRepoPinInGithubCdn(repo, theme),
           `${getRepoURL(repo)}#gh-${theme}-mode-only`,
         ),
       ),
@@ -26,7 +26,7 @@ export function getScaledRepaintedMarkdownPin(repo: IMiniRepo) {
 export function getOriginalDarkThemeMarkdownPin(repo: IMiniRepo) {
   return getMarkdownPin(
     repo.name,
-    getOriginalDarkThemePinURL(repo),
+    getDarkThemePinUrlFromGithubReadmeStatsService(repo),
     getRepoURL(repo),
   );
 }
