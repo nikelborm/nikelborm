@@ -1,10 +1,10 @@
 ## [Normalize](https://www.todepond.com/sky/normalise-dont-share-lol/) <!-- I want to lead by example --> sharing [scrappy fiddles](https://www.todepond.com/wikiblogarden/scrappy-fiddles/sharing/normalising/live/)
 
-### Below is the subset of my repos (mostly drafts/unfinished) which I believe is either promising, interesting, fun, or just the stuff I'm proud of or loved creating (because repo pins are limited)
+### Below is the subset of my repos (mostly drafts/unfinished), which I believe is either promising, interesting, fun, or just the stuff I'm proud of or loved creating (because repo pins are limited)
 
 (🥺👉👈 Sorry for the absence of Readmes 🥺👉👈)
 
-[![Auto render repos in README.md](https://github.com/nikelborm/nikelborm/actions/workflows/main.yml/badge.svg)](https://github.com/nikelborm/nikelborm/actions/workflows/main.yml) [![(UPDATE)](https://img.shields.io/badge/UPDATE-a82400)](https://github.com/nikelborm/nikelborm/actions/workflows/main.yml#rgh-run-workflow)
+![Profile views counter](https://komarev.com/ghpvc/?username=nikelborm) [![Auto render repos in README.md](https://github.com/nikelborm/nikelborm/actions/workflows/main.yml/badge.svg)](https://github.com/nikelborm/nikelborm/actions/workflows/main.yml) [![(UPDATE)](https://img.shields.io/badge/UPDATE-a82400)](https://github.com/nikelborm/nikelborm/actions/workflows/main.yml#rgh-run-workflow)
 
 <!-- Don't edit this. GitHub Action automatically generates it -->
 <!-- REPO-TABLE-INJECT-START -->
