@@ -56,9 +56,9 @@ export async function* racinglyIterateAll<
   if (errors.length > 1) throw new RacingIterationAggregateError(errors);
 }
 
-class RacingIterationAggregateError extends Error {
-  constructor(public readonly errors?: RacingIterationError[]) {
-    super('Few of the racing promises failed');
+class RacingIterationAggregateError extends AggregateError {
+  constructor(override errors: RacingIterationError[]) {
+    super(errors, 'Few of the racing promises failed');
   }
 }
 

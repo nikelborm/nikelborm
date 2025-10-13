@@ -40,6 +40,7 @@ export function getPinsSortedByTheirProbablePopularity(
         templateFactor: +repo.isTemplate,
         boilerplateFactor: +repo.name.includes('boiler'),
         archiveFactor: +repo.isItArchived,
+        effectFactor: +repo.name.includes('effect'),
         hackathonFactor: +repo.name.includes('hackathon'),
         experimentFactor: +repo.name.includes('experiment'),
         pushRecencyFactor: Number(repo.lastTimeBeenPushedInto),
@@ -58,6 +59,7 @@ export function getPinsSortedByTheirProbablePopularity(
       const biggestFirst = (f: Factor) => -smallestFirst(f);
       let _: number;
 
+      if ((_ = biggestFirst('effect'))) return _;
       if ((_ = biggestFirst('template'))) return _;
       if ((_ = biggestFirst('boilerplate'))) return _;
       if ((_ = smallestFirst('archive'))) return _;
