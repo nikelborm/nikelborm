@@ -2,9 +2,8 @@
 
 > [!TIP]
 > [**Leave anonymous feedback**](https://forms.gle/48wkUEQJBm6iMuSE6)
-> 
-> Good, bad, ugly, please be direct. I truly want to improve, I want to build good relationship and collaborate with you. I'm begging you, don't silently shove your feelings under the rug and keep grudges. Please, let's resolve them! Let's be friends! I'm open to change, and I want to have success in opensource, but without open communication, it would be impossible! 🙏🏻🫶🏻
-
+>
+> Help me become a better version of myself 🙏🏻 Say good, bad, ugly, don't hold back. I truly want to improve, I want to build good relationship and collaborate with other opensource-minded folks. I'm begging you, don't silently shove your feelings and thoughts under the rug and keep grudges. Please, let's resolve them! Let's be friends! I'm open to change, and I want to have success in opensource, but without open communication, it would be impossible! 🙏🏻🫶🏻
 
 ### Below is the subset of my repos (mostly drafts/unfinished), which I believe is either promising, interesting, fun, or just the stuff I'm proud of or loved creating (because repo pins are limited)
 
